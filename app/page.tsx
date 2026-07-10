@@ -1,64 +1,119 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import itineraryData from "@/data/itinerary.json";
+import KakaoMap from "@/components/KakaoMap";
+import { getDistanceKm, estimateDriveMinutes } from "@/lib/geo";
 
 export default function Home() {
+  const [selectedDay, setSelectedDay] = useState(1);
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+  const day = itineraryData.trip.days.find((d) => d.day === selectedDay);
+
+  // 좌표 있는 장소만 순서대로 추출해, 직전 장소와의 이동정보 매핑
+  const travelInfoByPlaceId: Record<string, { km: number; min: number }> = {};
+  if (day) {
+    let lastPlace: any = null;
+    day.places.forEach((place: any) => {
+      if (place.showOnMap && place.lat && place.lng) {
+        if (lastPlace) {
+          const km = getDistanceKm(lastPlace.lat, lastPlace.lng, place.lat, place.lng);
+          travelInfoByPlaceId[place.id] = { km, min: estimateDriveMinutes(km) };
+        }
+        lastPlace = place;
+      }
+    });
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div style={{ display: "flex", height: "100vh" }}>
+      <aside
+        style={{
+          width: 380,
+          overflowY: "auto",
+          padding: 16,
+          borderRight: "1px solid #eee",
+          background: "#fff",
+          color: "#111",
+        }}
+      >
+        <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12 }}>
+          {itineraryData.trip.title}
+        </h1>
+
+        <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+          {itineraryData.trip.days.map((d) => (
+            <button
+              key={d.day}
+              onClick={() => {
+                setSelectedDay(d.day);
+                setSelectedPlaceId(null);
+              }}
+              style={{
+                padding: "6px 12px",
+                borderRadius: 8,
+                border: "1px solid #ddd",
+                background: selectedDay === d.day ? "#4D96FF" : "#fff",
+                color: selectedDay === d.day ? "#fff" : "#333",
+                cursor: "pointer",
+              }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              {Number(d.date.split("-")[1])}월 {Number(d.date.split("-")[2])}일({d.label})
+            </button>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        {day?.places.map((place) => {
+          const travel = travelInfoByPlaceId[place.id];
+          return (
+            <div key={place.id}>
+              {travel && (
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "#4D96FF",
+                    padding: "4px 8px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                >
+                  🚗 약 {travel.min}분 이동 (직선거리 {travel.km.toFixed(1)}km, 근사치)
+                </div>
+              )}
+              <div
+                onClick={() => {
+                  if (place.showOnMap && place.lat && place.lng) {
+                    setSelectedPlaceId(place.id);
+                  }
+                }}
+                style={{
+                  padding: "10px 0",
+                  borderBottom: "1px solid #f0f0f0",
+                  cursor: place.showOnMap && place.lat && place.lng ? "pointer" : "default",
+                  background: selectedPlaceId === place.id ? "#F0F6FF" : "transparent",
+                  paddingLeft: 8,
+                  paddingRight: 8,
+                  borderRadius: 6,
+                }}
+              >
+                <div style={{ fontSize: 12, color: "#999" }}>
+                  {place.time} · {place.category}
+                </div>
+                <div style={{ fontWeight: 600, color: "#111" }}>{place.name}</div>
+                {place.memo && (
+                  <div style={{ fontSize: 13, color: "#666", marginTop: 2 }}>
+                    {place.memo}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </aside>
+
+      <main style={{ flex: 1 }}>
+        <KakaoMap selectedDay={selectedDay} selectedPlaceId={selectedPlaceId} />
       </main>
     </div>
   );
