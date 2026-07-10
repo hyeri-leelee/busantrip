@@ -10,7 +10,6 @@ export default function Home() {
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const day = itineraryData.trip.days.find((d) => d.day === selectedDay);
 
-  // 좌표 있는 장소만 순서대로 추출해, 직전 장소와의 이동정보 매핑
   const travelInfoByPlaceId: Record<string, { km: number; min: number }> = {};
   if (day) {
     let lastPlace: any = null;
@@ -26,8 +25,9 @@ export default function Home() {
   }
 
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div className="trip-container" style={{ display: "flex", height: "100vh" }}>
       <aside
+        className="trip-sidebar"
         style={{
           width: 380,
           overflowY: "auto",
@@ -112,7 +112,7 @@ export default function Home() {
         })}
       </aside>
 
-      <main style={{ flex: 1 }}>
+      <main className="trip-map" style={{ flex: 1 }}>
         <KakaoMap selectedDay={selectedDay} selectedPlaceId={selectedPlaceId} />
       </main>
     </div>
