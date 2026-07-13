@@ -34,15 +34,26 @@ export default function KakaoMap({
   const markerMapRef = useRef<Record<string, MarkerEntry>>({});
 
   useEffect(() => {
-    if (window.kakao && window.kakao.maps) return;
-    const script = document.createElement("script");
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&autoload=false`;
-    script.onload = () => {
-      window.kakao.maps.load(() => {
-        initMap();
-      });
-    };
-    document.head.appendChild(script);
+    // SDK가 이미 로드돼 있으면(다른 라우트에서 넘어온 경우) 바로 지도 생성
+    const loadMap = () => window.kakao.maps.load(() => initMap());
+
+    if (window.kakao && window.kakao.maps) {
+      loadMap();
+      return;
+    }
+
+    // 스크립트는 페이지당 한 번만 추가 (중복 방지)
+    let script = document.getElementById(
+      "kakao-map-sdk"
+    ) as HTMLScriptElement | null;
+    if (!script) {
+      script = document.createElement("script");
+      script.id = "kakao-map-sdk";
+      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&autoload=false`;
+      document.head.appendChild(script);
+    }
+    script.addEventListener("load", loadMap);
+    return () => script?.removeEventListener("load", loadMap);
   }, []);
 
   function initMap() {
