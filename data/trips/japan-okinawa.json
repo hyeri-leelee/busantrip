@@ -2,6 +2,41 @@
   "trip": {
     "title": "오키나와 여행",
     "mapProvider": "google",
-    "days": []
+    "days": [
+      {
+        "day": 1,
+        "date": "2026-09-19",
+        "label": "토",
+        "places": [
+          { "id": "o1-1", "time": "10:30", "name": "나하공항 도착", "category": "이동", "lat": 26.1958, "lng": 127.6459, "memo": "렌터카 픽업 (샘플 · 근사 좌표)", "showOnMap": true, "image": null },
+          { "id": "o1-2", "time": "12:00", "name": "국제거리(코쿠사이도리)", "category": "명소", "lat": 26.2145, "lng": 127.687, "memo": "나하 중심 번화가, 기념품·먹거리 (샘플)", "showOnMap": true, "image": null },
+          { "id": "o1-3", "time": "13:00", "name": "스테이크하우스 88 츠지점", "category": "식사", "lat": 26.2158, "lng": 127.6795, "memo": "오키나와식 스테이크 (샘플 · 근사 좌표)", "showOnMap": true, "image": null },
+          { "id": "o1-4", "time": "15:00", "name": "슈리성", "category": "명소", "lat": 26.217, "lng": 127.719, "memo": "류큐 왕국 유적 (잘 알려진 랜드마크)", "showOnMap": true, "image": null },
+          { "id": "o1-5", "time": "18:00", "name": "나하 시내 숙소", "category": "숙소", "lat": 26.2124, "lng": 127.6809, "memo": "체크인 (샘플 · 근사 좌표)", "showOnMap": true, "image": null }
+        ]
+      },
+      {
+        "day": 2,
+        "date": "2026-09-20",
+        "label": "일",
+        "places": [
+          { "id": "o2-1", "time": "09:00", "name": "만좌모", "category": "명소", "lat": 26.5045, "lng": 127.8497, "memo": "코끼리 코 모양 절벽 (샘플)", "showOnMap": true, "image": null },
+          { "id": "o2-2", "time": "11:00", "name": "츄라우미 수족관", "category": "명소", "lat": 26.6944, "lng": 127.8779, "memo": "고래상어 대수조 (잘 알려진 랜드마크)", "showOnMap": true, "image": null },
+          { "id": "o2-3", "time": "13:30", "name": "세소코 비치", "category": "명소", "lat": 26.6539, "lng": 127.8636, "memo": "에메랄드빛 해변 (샘플)", "showOnMap": true, "image": null },
+          { "id": "o2-4", "time": "15:30", "name": "코우리 대교·코우리섬", "category": "명소", "lat": 26.7017, "lng": 128.0183, "memo": "드라이브 명소 (샘플)", "showOnMap": true, "image": null },
+          { "id": "o2-5", "time": "18:30", "name": "온나손 저녁식사", "category": "식사", "lat": 26.4979, "lng": 127.8531, "memo": "상호 미정 (샘플)", "showOnMap": true, "image": null }
+        ]
+      },
+      {
+        "day": 3,
+        "date": "2026-09-21",
+        "label": "월",
+        "places": [
+          { "id": "o3-1", "time": "10:00", "name": "아메리칸 빌리지(차탄)", "category": "명소", "lat": 26.3155, "lng": 127.756, "memo": "관람차·쇼핑·포토존 (샘플)", "showOnMap": true, "image": null },
+          { "id": "o3-2", "time": "12:30", "name": "블루씰 아이스크림", "category": "카페", "lat": 26.3167, "lng": 127.7573, "memo": "오키나와 대표 아이스크림 (샘플 · 근사 좌표)", "showOnMap": true, "image": null },
+          { "id": "o3-3", "time": "16:00", "name": "나하공항 출발", "category": "이동", "lat": 26.1958, "lng": 127.6459, "memo": "렌터카 반납 후 출국 (샘플)", "showOnMap": true, "image": null }
+        ]
+      }
+    ]
   }
 }
