@@ -1,120 +1,62 @@
-"use client";
+import Link from "next/link";
+import { getAllTripSummaries } from "@/lib/trips";
 
-import { useState } from "react";
-import itineraryData from "@/data/itinerary.json";
-import KakaoMap from "@/components/KakaoMap";
-import { getDistanceKm, estimateDriveMinutes } from "@/lib/geo";
+function formatRange(start: string | null, end: string | null): string {
+  if (!start) return "일정 미정";
+  const fmt = (d: string) => {
+    const [, m, day] = d.split("-");
+    return `${Number(m)}.${Number(day)}`;
+  };
+  if (!end || start === end) return fmt(start);
+  return `${fmt(start)} ~ ${fmt(end)}`;
+}
 
 export default function Home() {
-  const [selectedDay, setSelectedDay] = useState(1);
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const day = itineraryData.trip.days.find((d) => d.day === selectedDay);
-
-  const travelInfoByPlaceId: Record<string, { km: number; min: number }> = {};
-  if (day) {
-    let lastPlace: any = null;
-    day.places.forEach((place: any) => {
-      if (place.showOnMap && place.lat && place.lng) {
-        if (lastPlace) {
-          const km = getDistanceKm(lastPlace.lat, lastPlace.lng, place.lat, place.lng);
-          travelInfoByPlaceId[place.id] = { km, min: estimateDriveMinutes(km) };
-        }
-        lastPlace = place;
-      }
-    });
-  }
+  const trips = getAllTripSummaries();
 
   return (
-    <div className="trip-container" style={{ display: "flex", height: "100vh" }}>
-      <aside
-        className="trip-sidebar"
-        style={{
-          width: 380,
-          overflowY: "auto",
-          padding: 16,
-          borderRight: "1px solid #eee",
-          background: "#fff",
-          color: "#111",
-        }}
-      >
-        <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12 }}>
-          {itineraryData.trip.title}
-        </h1>
+    <main
+      style={{
+        maxWidth: 640,
+        margin: "0 auto",
+        padding: "48px 20px",
+        color: "#111",
+      }}
+    >
+      <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8 }}>여행 목록</h1>
+      <p style={{ color: "#888", marginBottom: 28 }}>
+        여행지를 선택하면 일정과 지도를 볼 수 있습니다.
+      </p>
 
-        <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
-          {itineraryData.trip.days.map((d) => (
-            <button
-              key={d.day}
-              onClick={() => {
-                setSelectedDay(d.day);
-                setSelectedPlaceId(null);
-              }}
-              style={{
-                padding: "6px 12px",
-                borderRadius: 8,
-                border: "1px solid #ddd",
-                background: selectedDay === d.day ? "#4D96FF" : "#fff",
-                color: selectedDay === d.day ? "#fff" : "#333",
-                cursor: "pointer",
-              }}
-            >
-              {Number(d.date.split("-")[1])}월 {Number(d.date.split("-")[2])}일({d.label})
-            </button>
-          ))}
-        </div>
-
-        {day?.places.map((place) => {
-          const travel = travelInfoByPlaceId[place.id];
-          return (
-            <div key={place.id}>
-              {travel && (
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "#4D96FF",
-                    padding: "4px 8px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 4,
-                  }}
-                >
-                  🚗 약 {travel.min}분 이동 (직선거리 {travel.km.toFixed(1)}km, 근사치)
-                </div>
-              )}
-              <div
-                onClick={() => {
-                  if (place.showOnMap && place.lat && place.lng) {
-                    setSelectedPlaceId(place.id);
-                  }
-                }}
-                style={{
-                  padding: "10px 0",
-                  borderBottom: "1px solid #f0f0f0",
-                  cursor: place.showOnMap && place.lat && place.lng ? "pointer" : "default",
-                  background: selectedPlaceId === place.id ? "#F0F6FF" : "transparent",
-                  paddingLeft: 8,
-                  paddingRight: 8,
-                  borderRadius: 6,
-                }}
-              >
-                <div style={{ fontSize: 12, color: "#999" }}>
-                  {place.time} · {place.category}
-                </div>
-                <div style={{ fontWeight: 600, color: "#111" }}>{place.name}</div>
-                {place.memo && (
-                  <div style={{ fontSize: 13, color: "#666", marginTop: 2 }}>
-                    {place.memo}
-                  </div>
-                )}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {trips.map((trip) => (
+          <Link
+            key={trip.slug}
+            href={`/${trip.slug}`}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "18px 20px",
+              border: "1px solid #eee",
+              borderRadius: 12,
+              textDecoration: "none",
+              color: "inherit",
+              background: "#fff",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 700 }}>{trip.title}</div>
+              <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>
+                {trip.dayCount > 0
+                  ? `${trip.dayCount}일 · ${formatRange(trip.startDate, trip.endDate)}`
+                  : "준비 중"}
               </div>
             </div>
-          );
-        })}
-      </aside>
-
-      <main className="trip-map" style={{ flex: 1 }}>
-        <KakaoMap selectedDay={selectedDay} selectedPlaceId={selectedPlaceId} />
-      </main>
-    </div>
+            <span style={{ color: "#4D96FF", fontSize: 20 }}>→</span>
+          </Link>
+        ))}
+      </div>
+    </main>
   );
 }

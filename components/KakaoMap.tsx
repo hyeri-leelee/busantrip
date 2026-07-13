@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import itineraryData from "@/data/itinerary.json";
+import type { Day } from "@/lib/trips";
 
 const CATEGORY_COLOR: Record<string, string> = {
   식사: "#FF6B6B",
@@ -20,9 +20,11 @@ declare global {
 type MarkerEntry = { position: any; el: HTMLDivElement };
 
 export default function KakaoMap({
+  days,
   selectedDay,
   selectedPlaceId,
 }: {
+  days: Day[];
   selectedDay: number;
   selectedPlaceId: string | null;
 }) {
@@ -59,7 +61,7 @@ export default function KakaoMap({
     overlaysRef.current = [];
     markerMapRef.current = {};
 
-    const day = itineraryData.trip.days.find((d) => d.day === selectedDay);
+    const day = days.find((d) => d.day === selectedDay);
     if (!day) return;
 
     const places = day.places.filter(
@@ -148,7 +150,7 @@ export default function KakaoMap({
     if (places.length > 0) {
       mapInstance.setBounds(bounds);
     }
-  }, [mapInstance, selectedDay]);
+  }, [mapInstance, selectedDay, days]);
 
   useEffect(() => {
     if (!mapInstance || !selectedPlaceId) return;
