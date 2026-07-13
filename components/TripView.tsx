@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import KakaoMap from "@/components/KakaoMap";
+import GoogleMap from "@/components/GoogleMap";
 import { getDistanceKm, estimateDriveMinutes } from "@/lib/geo";
 import type { Trip } from "@/lib/trips";
 
@@ -222,11 +223,19 @@ export default function TripView({ trip }: { trip: Trip }) {
       </aside>
 
       <main className="trip-map" style={{ flex: 1 }}>
-        <KakaoMap
-          days={trip.days}
-          selectedDay={selectedDay}
-          selectedPlaceId={selectedPlaceId}
-        />
+        {trip.mapProvider === "google" ? (
+          <GoogleMap
+            days={trip.days}
+            selectedDay={selectedDay}
+            selectedPlaceId={selectedPlaceId}
+          />
+        ) : (
+          <KakaoMap
+            days={trip.days}
+            selectedDay={selectedDay}
+            selectedPlaceId={selectedPlaceId}
+          />
+        )}
       </main>
     </div>
   );

@@ -1,6 +1,7 @@
 {
   "trip": {
     "title": "오키나와 여행",
+    "mapProvider": "google",
     "days": []
   }
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAllTripSummaries } from "@/lib/trips";
+import { canEdit, getAllTripSummaries } from "@/lib/trips";
 
 function formatRange(start: string | null, end: string | null): string {
   if (!start) return "일정 미정";
@@ -23,7 +23,20 @@ export default function Home() {
         color: "#111",
       }}
     >
-      <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8 }}>여행 목록</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "baseline",
+        }}
+      >
+        <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8 }}>여행 목록</h1>
+        {canEdit() && (
+          <Link href="/admin" style={{ fontSize: 13, color: "#4D96FF" }}>
+            관리자
+          </Link>
+        )}
+      </div>
       <p style={{ color: "#888", marginBottom: 28 }}>
         여행지를 선택하면 일정과 지도를 볼 수 있습니다.
       </p>
