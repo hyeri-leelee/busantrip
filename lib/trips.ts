@@ -14,6 +14,7 @@ export type Place = {
   lng: number | null;
   memo: string;
   showOnMap: boolean;
+  image?: string | null;
 };
 
 export type Day = {
