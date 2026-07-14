@@ -2,14 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Day } from "@/lib/trips";
-
-const CATEGORY_COLOR: Record<string, string> = {
-  식사: "#FF6B6B",
-  카페: "#C08552",
-  명소: "#4D96FF",
-  숙소: "#6C5CE7",
-  이동: "#95A5A6",
-};
+import { dayColor } from "@/lib/colors";
 
 declare global {
   interface Window {
@@ -25,7 +18,7 @@ export default function GoogleMap({
   selectedPlaceId,
 }: {
   days: Day[];
-  selectedDay: number;
+  selectedDay: number | "all";
   selectedPlaceId: string | null;
 }) {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -75,54 +68,89 @@ export default function GoogleMap({
     overlaysRef.current = [];
     markerMapRef.current = {};
 
-    const day = days.find((d) => d.day === selectedDay);
-    if (!day) return;
+    // 전체 보기면 모든 날짜, 특정 날짜면 그 날짜만 렌더한다.
+    const shownDays =
+      selectedDay === "all" ? days : days.filter((d) => d.day === selectedDay);
+    if (shownDays.length === 0) return;
 
-    const places = day.places.filter((p) => p.showOnMap && p.lat != null && p.lng != null);
     const bounds = new window.google.maps.LatLngBounds();
-    const linePath: any[] = [];
+    let totalPlaces = 0;
 
-    places.forEach((place, index) => {
-      const pos = { lat: place.lat as number, lng: place.lng as number };
-      bounds.extend(pos);
-      linePath.push(pos);
-      const color = CATEGORY_COLOR[place.category] || "#4D96FF";
+    shownDays.forEach((day) => {
+      const color = dayColor(day.day);
+      const places = day.places.filter(
+        (p) => p.showOnMap && p.lat != null && p.lng != null
+      );
+      const linePath: any[] = [];
 
-      const marker = new window.google.maps.Marker({
-        map: mapInstance,
-        position: pos,
-        label: { text: String(index + 1), color: "#fff", fontSize: "12px", fontWeight: "700" },
-        icon: {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 13,
-          fillColor: color,
-          fillOpacity: 1,
-          strokeColor: "#fff",
-          strokeWeight: 2,
-        },
+      places.forEach((place, index) => {
+        const pos = { lat: place.lat as number, lng: place.lng as number };
+        bounds.extend(pos);
+        linePath.push(pos);
+        totalPlaces++;
+
+        const marker = new window.google.maps.Marker({
+          map: mapInstance,
+          position: pos,
+          label: {
+            text: String(index + 1),
+            color: "#fff",
+            fontSize: "12px",
+            fontWeight: "700",
+          },
+          icon: {
+            path: window.google.maps.SymbolPath.CIRCLE,
+            scale: 13,
+            fillColor: color,
+            fillOpacity: 1,
+            strokeColor: "#fff",
+            strokeWeight: 2,
+          },
+        });
+
+        const info = new window.google.maps.InfoWindow({ content: place.name });
+        marker.addListener("click", () =>
+          info.open({ map: mapInstance, anchor: marker })
+        );
+
+        overlaysRef.current.push(marker);
+        markerMapRef.current[place.id] = { marker, info };
       });
 
-      const info = new window.google.maps.InfoWindow({ content: place.name });
-      marker.addListener("click", () => info.open({ map: mapInstance, anchor: marker }));
+      if (linePath.length > 1) {
+        const polyline = new window.google.maps.Polyline({
+          map: mapInstance,
+          path: linePath,
+          strokeColor: color,
+          strokeOpacity: 0.7,
+          strokeWeight: 3,
+        });
+        overlaysRef.current.push(polyline);
+      }
 
-      overlaysRef.current.push(marker);
-      markerMapRef.current[place.id] = { marker, info };
+      // 경로 라인(도보길 등) 그리기
+      (day.routes ?? []).forEach((route) => {
+        const pts = (route.path ?? [])
+          .filter((p) => p.lat != null && p.lng != null)
+          .map((p) => ({ lat: p.lat, lng: p.lng }));
+        if (pts.length < 2) return;
+        pts.forEach((pt) => bounds.extend(pt));
+        totalPlaces++;
+
+        const routeLine = new window.google.maps.Polyline({
+          map: mapInstance,
+          path: pts,
+          strokeColor: route.color || color,
+          strokeOpacity: 0.9,
+          strokeWeight: 6,
+        });
+        overlaysRef.current.push(routeLine);
+      });
     });
 
-    if (linePath.length > 1) {
-      const polyline = new window.google.maps.Polyline({
-        map: mapInstance,
-        path: linePath,
-        strokeColor: "#4D96FF",
-        strokeOpacity: 0.7,
-        strokeWeight: 3,
-      });
-      overlaysRef.current.push(polyline);
-    }
-
-    if (places.length > 0) {
+    if (totalPlaces > 0) {
       mapInstance.fitBounds(bounds);
-      if (places.length === 1) mapInstance.setZoom(15);
+      if (totalPlaces === 1) mapInstance.setZoom(15);
     }
   }, [mapInstance, selectedDay, days]);
 

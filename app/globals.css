@@ -1,16 +1,98 @@
+/* ===== 여행 일정 뷰 · 따뜻한 크림/테라코타 팔레트 ===== */
+:root {
+  --bg: #f4efe4; /* 사이드바 크림 배경 */
+  --card: #fcfaf3; /* 펼쳐진 장소 카드 배경 */
+  --ink: #2b2620; /* 기본 텍스트(먹색) */
+  --ink-soft: #6b6459; /* 설명 텍스트 */
+  --muted: #9c9384; /* 날짜·개수 등 옅은 텍스트 */
+  --accent: #b0563c; /* 테라코타 포인트 */
+  --border: #e4dccb; /* 구분선 */
+  --chip-border: #d9cfbd;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), -apple-system, "Segoe UI", "Malgun Gothic",
+    "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+/* ===== 레이아웃 ===== */
+.trip-container {
+  display: flex;
+  height: 100vh;
+}
+
+.trip-sidebar {
+  width: 360px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  background: var(--bg);
+  color: var(--ink);
+  border-right: 1px solid var(--border);
+}
+
+.trip-map {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 칩(전체/Day) 가로 스크롤 — 스크롤바 숨김 */
+.day-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 2px;
+}
+.day-chips::-webkit-scrollbar {
+  display: none;
+}
+
+/* 날짜 요약 리스트 행 */
+.day-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.day-row:hover {
+  background: rgba(176, 86, 60, 0.05);
+}
+
+/* 설명 두 줄 말줄임 */
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ===== 모바일: 지도가 위, 요약 리스트가 아래 (레퍼런스와 동일) ===== */
 @media (max-width: 768px) {
   .trip-container {
-    flex-direction: column !important;
-    height: auto !important;
+    flex-direction: column-reverse;
+    height: auto;
+    min-height: 100vh;
   }
   .trip-sidebar {
-    width: 100% !important;
-    height: 50vh !important;
-    border-right: none !important;
-    border-bottom: 1px solid #eee;
+    width: 100%;
+    height: auto;
+    overflow-y: visible;
+    border-right: none;
   }
   .trip-map {
-    width: 100% !important;
-    height: 50vh !important;
+    width: 100%;
+    height: 55vh;
+    flex: none;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    border-bottom: 1px solid var(--border);
   }
 }

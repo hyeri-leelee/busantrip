@@ -2,14 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Day } from "@/lib/trips";
-
-const CATEGORY_COLOR: Record<string, string> = {
-  식사: "#FF6B6B",
-  카페: "#C08552",
-  명소: "#4D96FF",
-  숙소: "#6C5CE7",
-  이동: "#95A5A6",
-};
+import { dayColor } from "@/lib/colors";
 
 declare global {
   interface Window {
@@ -25,7 +18,7 @@ export default function KakaoMap({
   selectedPlaceId,
 }: {
   days: Day[];
-  selectedDay: number;
+  selectedDay: number | "all";
   selectedPlaceId: string | null;
 }) {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -72,93 +65,141 @@ export default function KakaoMap({
     overlaysRef.current = [];
     markerMapRef.current = {};
 
-    const day = days.find((d) => d.day === selectedDay);
-    if (!day) return;
-
-    const places = day.places.filter(
-      (p: any) => p.showOnMap && p.lat && p.lng
-    );
+    // 전체 보기면 모든 날짜, 특정 날짜면 그 날짜만 렌더한다.
+    const shownDays =
+      selectedDay === "all" ? days : days.filter((d) => d.day === selectedDay);
+    if (shownDays.length === 0) return;
 
     const bounds = new window.kakao.maps.LatLngBounds();
-    const linePath: any[] = [];
+    let totalPlaces = 0;
 
-    places.forEach((place: any, index: number) => {
-      const pos = new window.kakao.maps.LatLng(place.lat, place.lng);
-      bounds.extend(pos);
-      linePath.push(pos);
+    shownDays.forEach((day) => {
+      const color = dayColor(day.day);
+      const places = day.places.filter(
+        (p: any) => p.showOnMap && p.lat && p.lng
+      );
+      const linePath: any[] = [];
 
-      const color = CATEGORY_COLOR[place.category] || "#4D96FF";
-      const order = index + 1;
+      places.forEach((place: any, index: number) => {
+        const pos = new window.kakao.maps.LatLng(place.lat, place.lng);
+        bounds.extend(pos);
+        linePath.push(pos);
+        totalPlaces++;
 
-      const wrapper = document.createElement("div");
-      wrapper.style.position = "relative";
-      wrapper.style.display = "flex";
-      wrapper.style.flexDirection = "column";
-      wrapper.style.alignItems = "center";
-      wrapper.style.cursor = "pointer";
+        const order = index + 1;
 
-      const badge = document.createElement("div");
-      badge.innerText = String(order);
-      badge.style.width = "26px";
-      badge.style.height = "26px";
-      badge.style.borderRadius = "50%";
-      badge.style.background = color;
-      badge.style.color = "#fff";
-      badge.style.fontSize = "13px";
-      badge.style.fontWeight = "700";
-      badge.style.display = "flex";
-      badge.style.alignItems = "center";
-      badge.style.justifyContent = "center";
-      badge.style.border = "2px solid #fff";
-      badge.style.boxShadow = "0 1px 4px rgba(0,0,0,0.3)";
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "relative";
+        wrapper.style.display = "flex";
+        wrapper.style.flexDirection = "column";
+        wrapper.style.alignItems = "center";
+        wrapper.style.cursor = "pointer";
 
-      const tooltip = document.createElement("div");
-      tooltip.innerText = place.name;
-      tooltip.style.position = "absolute";
-      tooltip.style.bottom = "32px";
-      tooltip.style.padding = "4px 8px";
-      tooltip.style.background = "#fff";
-      tooltip.style.color = "#111";
-      tooltip.style.fontSize = "12px";
-      tooltip.style.borderRadius = "4px";
-      tooltip.style.boxShadow = "0 1px 4px rgba(0,0,0,0.3)";
-      tooltip.style.whiteSpace = "nowrap";
-      tooltip.style.display = "none";
+        const badge = document.createElement("div");
+        badge.innerText = String(order);
+        badge.style.width = "26px";
+        badge.style.height = "26px";
+        badge.style.borderRadius = "50%";
+        badge.style.background = color;
+        badge.style.color = "#fff";
+        badge.style.fontSize = "13px";
+        badge.style.fontWeight = "700";
+        badge.style.display = "flex";
+        badge.style.alignItems = "center";
+        badge.style.justifyContent = "center";
+        badge.style.border = "2px solid #fff";
+        badge.style.boxShadow = "0 1px 4px rgba(0,0,0,0.3)";
 
-      wrapper.appendChild(tooltip);
-      wrapper.appendChild(badge);
-
-      wrapper.addEventListener("mouseenter", () => {
-        tooltip.style.display = "block";
-      });
-      wrapper.addEventListener("mouseleave", () => {
+        const tooltip = document.createElement("div");
+        tooltip.innerText = place.name;
+        tooltip.style.position = "absolute";
+        tooltip.style.bottom = "32px";
+        tooltip.style.padding = "4px 8px";
+        tooltip.style.background = "#fff";
+        tooltip.style.color = "#111";
+        tooltip.style.fontSize = "12px";
+        tooltip.style.borderRadius = "4px";
+        tooltip.style.boxShadow = "0 1px 4px rgba(0,0,0,0.3)";
+        tooltip.style.whiteSpace = "nowrap";
         tooltip.style.display = "none";
+
+        wrapper.appendChild(tooltip);
+        wrapper.appendChild(badge);
+
+        wrapper.addEventListener("mouseenter", () => {
+          tooltip.style.display = "block";
+        });
+        wrapper.addEventListener("mouseleave", () => {
+          tooltip.style.display = "none";
+        });
+
+        const customOverlay = new window.kakao.maps.CustomOverlay({
+          map: mapInstance,
+          position: pos,
+          content: wrapper,
+          yAnchor: 0.5,
+        });
+        overlaysRef.current.push(customOverlay);
+
+        markerMapRef.current[place.id] = { position: pos, el: wrapper };
       });
 
-      const customOverlay = new window.kakao.maps.CustomOverlay({
-        map: mapInstance,
-        position: pos,
-        content: wrapper,
-        yAnchor: 0.5,
-      });
-      overlaysRef.current.push(customOverlay);
+      if (linePath.length > 1) {
+        const polyline = new window.kakao.maps.Polyline({
+          map: mapInstance,
+          path: linePath,
+          strokeWeight: 3,
+          strokeColor: color,
+          strokeOpacity: 0.7,
+          strokeStyle: "shortdash",
+        });
+        overlaysRef.current.push(polyline);
+      }
 
-      markerMapRef.current[place.id] = { position: pos, el: wrapper };
+      // 경로 라인(도보길 등) 그리기
+      (day.routes ?? []).forEach((route) => {
+        const pts = (route.path ?? [])
+          .filter((p) => p.lat != null && p.lng != null)
+          .map((p) => new window.kakao.maps.LatLng(p.lat, p.lng));
+        if (pts.length < 2) return;
+        pts.forEach((pt) => bounds.extend(pt));
+        totalPlaces++; // 라인만 있는 날도 지도 범위가 잡히도록
+
+        const routeLine = new window.kakao.maps.Polyline({
+          map: mapInstance,
+          path: pts,
+          strokeWeight: 6,
+          strokeColor: route.color || color,
+          strokeOpacity: 0.9,
+          strokeStyle: "solid",
+        });
+        overlaysRef.current.push(routeLine);
+
+        if (route.name) {
+          const mid = pts[Math.floor(pts.length / 2)];
+          const label = document.createElement("div");
+          label.innerText = route.name;
+          label.style.transform = "translateY(-14px)";
+          label.style.padding = "3px 8px";
+          label.style.background = route.color || color;
+          label.style.color = "#fff";
+          label.style.fontSize = "11px";
+          label.style.fontWeight = "700";
+          label.style.borderRadius = "6px";
+          label.style.whiteSpace = "nowrap";
+          label.style.boxShadow = "0 1px 4px rgba(0,0,0,0.3)";
+          const labelOverlay = new window.kakao.maps.CustomOverlay({
+            map: mapInstance,
+            position: mid,
+            content: label,
+            yAnchor: 1,
+          });
+          overlaysRef.current.push(labelOverlay);
+        }
+      });
     });
 
-    if (linePath.length > 1) {
-      const polyline = new window.kakao.maps.Polyline({
-        map: mapInstance,
-        path: linePath,
-        strokeWeight: 3,
-        strokeColor: "#4D96FF",
-        strokeOpacity: 0.7,
-        strokeStyle: "shortdash",
-      });
-      overlaysRef.current.push(polyline);
-    }
-
-    if (places.length > 0) {
+    if (totalPlaces > 0) {
       mapInstance.setBounds(bounds);
     }
   }, [mapInstance, selectedDay, days]);

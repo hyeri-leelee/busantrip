@@ -10,13 +10,23 @@
           { "id": "d1-1", "time": "12:00", "name": "용인", "category": "이동", "lat": null, "lng": null, "memo": "점심 먹고 출발 (4시간 30분 소요 예상)", "showOnMap": false },
           { "id": "d1-2", "time": "17:00", "name": "부산 도착", "category": "이동", "lat": null, "lng": null, "memo": "", "showOnMap": false },
           { "id": "d1-3", "time": "", "name": "광안리(광리단길)", "category": "명소", "lat": 35.1533, "lng": 129.1186, "memo": "상점가 구경, 해리단길이 더 볼거리 많음", "showOnMap": true },
-          { "id": "d1-4", "time": "", "name": "시즌즈 광안점", "category": "카페", "lat": 35.1459, "lng": 129.1204, "memo": "부산 수영구 광안해변로255번길 40 (검색 확인)", "showOnMap": true },
+          { "id": "d1-4", "time": "", "name": "시즌스 광안점", "category": "카페", "lat": 35.1503, "lng": 129.1190, "memo": "부산 수영구 광안해변로255번길 40 1층 · 바다 위에 떠 있는 매장 (좌표 근사, 지도에서 확인 요망)", "showOnMap": true },
           { "id": "d1-5", "time": "", "name": "광안비치랜드(광안리해수욕장)", "category": "명소", "lat": 35.1533, "lng": 129.1186, "memo": "", "showOnMap": true },
           { "id": "d1-6", "time": "", "name": "서희스타힐스센텀프리모오피스텔 주차장", "category": "이동", "lat": 35.1691, "lng": 129.1306, "memo": "센텀시티 지역 근사 좌표", "showOnMap": false },
           { "id": "d1-7", "time": "20:00", "name": "포켓몬 드론쇼", "category": "명소", "lat": 35.1533, "lng": 129.1186, "memo": "8시 보기", "showOnMap": true },
-          { "id": "d1-8", "time": "", "name": "하얏트 플레이스 해운대", "category": "숙소", "lat": 35.1596, "lng": 129.1600, "memo": "체크인 276,200원 · 좌표 확인 필요", "showOnMap": true },
+          { "id": "d1-8", "time": "", "name": "하얏트 플레이스 부산연산", "category": "숙소", "lat": 35.1852, "lng": 129.0783, "memo": "체크인 276,200원 · 부산 연제구 중앙대로 1121 (좌표 근사, 지도에서 확인 요망)", "showOnMap": true },
           { "id": "d1-9", "time": "18:00", "name": "맹구포차", "category": "식사", "lat": 35.1480, "lng": 129.1148, "memo": "평점 5.0, 로컬 감성 포차, 일찍 가는 걸 추천 · 부산 수영구 남천바다로 33번길 72 (검색 확인, 좌표는 근사)", "showOnMap": true },
           { "id": "d1-10", "time": "18:00", "name": "간빠맥주 서면형제점", "category": "식사", "lat": 35.1577, "lng": 129.0594, "memo": "일본식 이자카야, 오픈 30분 내 만석 · 서면 지역 근사 좌표 (정확 주소 미확인)", "showOnMap": true }
+        ],
+        "routes": [
+          {
+            "name": "광리단길 (광안역→광안해수욕장)",
+            "path": [
+              { "lat": 35.1543, "lng": 129.1128 },
+              { "lat": 35.1536, "lng": 129.1158 },
+              { "lat": 35.1531, "lng": 129.1187 }
+            ]
+          }
         ]
       },
       {
@@ -24,7 +34,7 @@
         "date": "2026-07-26",
         "label": "일",
         "places": [
-          { "id": "d2-1", "time": "", "name": "광안 숙소(하얏트 플레이스)", "category": "숙소", "lat": 35.1596, "lng": 129.1600, "memo": "", "showOnMap": true },
+          { "id": "d2-1", "time": "", "name": "하얏트 플레이스 부산연산", "category": "숙소", "lat": 35.1852, "lng": 129.0783, "memo": "부산 연제구 중앙대로 1121 (좌표 근사)", "showOnMap": true },
           { "id": "d2-2", "time": "13:30", "name": "바닷마을과자점", "category": "카페", "lat": 35.1637, "lng": 129.1638, "memo": "일찍 방문해야 케이크 가능, 캐치테이블 원격예약(12시 오픈), 추천메뉴 생토노레 · 좌표 확인 필요", "showOnMap": true },
           { "id": "d2-3", "time": "12:00", "name": "창원 도착", "category": "이동", "lat": 35.2281, "lng": 128.6811, "memo": "", "showOnMap": false },
           { "id": "d2-4", "time": "", "name": "창원 맛집", "category": "식사", "lat": null, "lng": null, "memo": "점심식사 · 상호 및 좌표 확인 필요", "showOnMap": true },

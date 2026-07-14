@@ -17,17 +17,31 @@ export type Place = {
   image?: string | null;
 };
 
+// 지도에 그릴 경로 라인(도보길 등). path는 위경도 좌표를 순서대로 잇는다.
+export type RouteLine = {
+  name?: string;
+  color?: string;
+  path: { lat: number; lng: number }[];
+};
+
 export type Day = {
   day: number;
   date: string;
   label: string;
+  // 요약 리스트에 표시할 그날의 제목/한줄 설명(선택). 없으면 장소명으로 자동 생성한다.
+  title?: string;
+  summary?: string;
   places: Place[];
+  // 지도에 그릴 경로 라인(선택). 예: 광안역→광안해수욕장 도보길
+  routes?: RouteLine[];
 };
 
 export type MapProvider = "kakao" | "google";
 
 export type Trip = {
   title: string;
+  // 제목 아래 한 줄 경로/설명(선택). 없으면 날짜별 제목을 이어 자동 생성한다.
+  subtitle?: string;
   mapProvider: MapProvider;
   days: Day[];
 };
@@ -68,7 +82,12 @@ export function getTrip(slug: string): Trip | null {
     }
   ).trip;
   // 기존 데이터 호환: mapProvider 없으면 kakao 기본값
-  return { title: t.title, days: t.days, mapProvider: t.mapProvider ?? "kakao" };
+  return {
+    title: t.title,
+    subtitle: t.subtitle,
+    days: t.days,
+    mapProvider: t.mapProvider ?? "kakao",
+  };
 }
 
 export function getAllTripSummaries(): TripSummary[] {
