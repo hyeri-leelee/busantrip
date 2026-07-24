@@ -33,10 +33,12 @@ export default function KakaoMap({
   days,
   selectedDay,
   selectedPlaceId,
+  onSelectPlace,
 }: {
   days: Day[];
   selectedDay: number | "all";
   selectedPlaceId: string | null;
+  onSelectPlace: (id: string) => void;
 }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<any>(null);
@@ -185,6 +187,7 @@ export default function KakaoMap({
         wrapper.addEventListener("mouseleave", () => {
           tooltip.style.display = "none";
         });
+        wrapper.addEventListener("click", () => onSelectPlace(place.id));
 
         const customOverlay = new window.kakao.maps.CustomOverlay({
           map: mapInstance,
@@ -255,7 +258,7 @@ export default function KakaoMap({
     if (totalPlaces > 0) {
       mapInstance.setBounds(bounds);
     }
-  }, [mapInstance, selectedDay, days]);
+  }, [mapInstance, selectedDay, days, onSelectPlace]);
 
   useEffect(() => {
     if (!mapInstance || !selectedPlaceId) return;

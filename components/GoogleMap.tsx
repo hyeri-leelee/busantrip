@@ -17,10 +17,12 @@ export default function GoogleMap({
   days,
   selectedDay,
   selectedPlaceId,
+  onSelectPlace,
 }: {
   days: Day[];
   selectedDay: number | "all";
   selectedPlaceId: string | null;
+  onSelectPlace: (id: string) => void;
 }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<any>(null);
@@ -164,9 +166,10 @@ export default function GoogleMap({
         const marker = new window.google.maps.Marker(markerOptions);
 
         const info = new window.google.maps.InfoWindow({ content: place.name });
-        marker.addListener("click", () =>
-          info.open({ map: mapInstance, anchor: marker })
-        );
+        marker.addListener("click", () => {
+          info.open({ map: mapInstance, anchor: marker });
+          onSelectPlace(place.id);
+        });
 
         overlaysRef.current.push(marker);
         markerMapRef.current[place.id] = { marker, info };
@@ -207,7 +210,7 @@ export default function GoogleMap({
       mapInstance.fitBounds(bounds);
       if (totalPlaces === 1) mapInstance.setZoom(15);
     }
-  }, [mapInstance, selectedDay, days]);
+  }, [mapInstance, selectedDay, days, onSelectPlace]);
 
   useEffect(() => {
     if (!mapInstance || !selectedPlaceId) return;

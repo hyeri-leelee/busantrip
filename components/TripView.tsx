@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import KakaoMap from "@/components/KakaoMap";
 import GoogleMap from "@/components/GoogleMap";
@@ -47,6 +47,17 @@ export default function TripView({ trip }: { trip: Trip }) {
     setSelectedDay((prev) => (prev === d ? "all" : d));
     setSelectedPlaceId(null);
   }
+
+  // 장소 선택(리스트 카드 클릭 또는 지도 마커 클릭 공통):
+  // 해당 장소가 속한 날짜를 펼치고, 그 장소를 활성화한다.
+  const handleSelectPlace = useCallback(
+    (placeId: string) => {
+      const day = trip.days.find((d) => d.places.some((p) => p.id === placeId));
+      if (day) setSelectedDay(day.day);
+      setSelectedPlaceId(placeId);
+    },
+    [trip.days]
+  );
 
   return (
     <div className="trip-container">
@@ -146,7 +157,7 @@ export default function TripView({ trip }: { trip: Trip }) {
                     selected={selectedDay === d.day}
                     selectedPlaceId={selectedPlaceId}
                     onSelectDay={() => selectDay(d.day)}
-                    onSelectPlace={setSelectedPlaceId}
+                    onSelectPlace={handleSelectPlace}
                   />
                 ))}
               </div>
@@ -183,12 +194,14 @@ export default function TripView({ trip }: { trip: Trip }) {
             days={trip.days}
             selectedDay={selectedDay}
             selectedPlaceId={selectedPlaceId}
+            onSelectPlace={handleSelectPlace}
           />
         ) : (
           <KakaoMap
             days={trip.days}
             selectedDay={selectedDay}
             selectedPlaceId={selectedPlaceId}
+            onSelectPlace={handleSelectPlace}
           />
         )}
       </main>
@@ -467,6 +480,17 @@ function PlaceCards({
   );
 }
 
+// 활성화되면 해당 요소를 사이드바 안에서 보이도록 스크롤한다(지도 마커 클릭 시 유용).
+function useActiveScroll(active: boolean) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (active && ref.current) {
+      ref.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [active]);
+  return ref;
+}
+
 // 카테고리별 아이콘(후보지 그룹 헤더 등)
 function categoryIcon(category?: string): string {
   switch (category) {
@@ -500,6 +524,7 @@ function ConfirmedCard({
   onSelectPlace: (id: string) => void;
 }) {
   const clickable = place.showOnMap && place.lat != null && place.lng != null;
+  const ref = useActiveScroll(active);
   return (
     <div>
       {travel && (
@@ -508,6 +533,7 @@ function ConfirmedCard({
         </div>
       )}
       <div
+        ref={ref}
         onClick={() => clickable && onSelectPlace(place.id)}
         style={{
           display: "flex",
@@ -600,8 +626,10 @@ function OptionalCard({
   onSelectPlace: (id: string) => void;
 }) {
   const clickable = place.showOnMap && place.lat != null && place.lng != null;
+  const ref = useActiveScroll(active);
   return (
     <div
+      ref={ref}
       onClick={() => clickable && onSelectPlace(place.id)}
       style={{
         display: "flex",
@@ -716,58 +744,76 @@ function CandidateGroupCard({
 
       {/* 후보 목록 */}
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {places.map((place) => {
-          const clickable = place.showOnMap && place.lat != null && place.lng != null;
-          const active = selectedPlaceId === place.id;
-          return (
-            <div
-              key={place.id}
-              onClick={() => clickable && onSelectPlace(place.id)}
-              style={{
-                display: "flex",
-                gap: 8,
-                padding: "8px 10px",
-                background: "var(--card)",
-                border: `1px solid ${active ? color : "var(--border)"}`,
-                borderRadius: 8,
-                boxShadow: active ? `0 0 0 1px ${color}33` : "none",
-                cursor: clickable ? "pointer" : "default",
-                transition: "border-color .15s, box-shadow .15s",
-              }}
-            >
-              <span
-                style={{
-                  flexShrink: 0,
-                  marginTop: 5,
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  background: color,
-                }}
-              />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{ fontWeight: 700, color: "var(--ink)", fontSize: 13.5, lineHeight: 1.3 }}
-                >
-                  {place.name}
-                </div>
-                {place.memo && (
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: "var(--ink-soft)",
-                      marginTop: 2,
-                      lineHeight: 1.4,
-                      whiteSpace: "pre-line",
-                    }}
-                  >
-                    {place.memo}
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {places.map((place) => (
+          <CandidateRow
+            key={place.id}
+            place={place}
+            color={color}
+            active={selectedPlaceId === place.id}
+            onSelectPlace={onSelectPlace}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CandidateRow({
+  place,
+  color,
+  active,
+  onSelectPlace,
+}: {
+  place: Place;
+  color: string;
+  active: boolean;
+  onSelectPlace: (id: string) => void;
+}) {
+  const clickable = place.showOnMap && place.lat != null && place.lng != null;
+  const ref = useActiveScroll(active);
+  return (
+    <div
+      ref={ref}
+      onClick={() => clickable && onSelectPlace(place.id)}
+      style={{
+        display: "flex",
+        gap: 8,
+        padding: "8px 10px",
+        background: "var(--card)",
+        border: `1px solid ${active ? color : "var(--border)"}`,
+        borderRadius: 8,
+        boxShadow: active ? `0 0 0 1px ${color}33` : "none",
+        cursor: clickable ? "pointer" : "default",
+        transition: "border-color .15s, box-shadow .15s",
+      }}
+    >
+      <span
+        style={{
+          flexShrink: 0,
+          marginTop: 5,
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          background: color,
+        }}
+      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontWeight: 700, color: "var(--ink)", fontSize: 13.5, lineHeight: 1.3 }}>
+          {place.name}
+        </div>
+        {place.memo && (
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--ink-soft)",
+              marginTop: 2,
+              lineHeight: 1.4,
+              whiteSpace: "pre-line",
+            }}
+          >
+            {place.memo}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -863,55 +909,67 @@ function TeamBranchCard({
               </div>
               {/* 팀 일정 */}
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                {byTeam[teamName].map((place) => {
-                  const clickable =
-                    place.showOnMap && place.lat != null && place.lng != null;
-                  const active = selectedPlaceId === place.id;
-                  return (
-                    <div
-                      key={place.id}
-                      onClick={() => clickable && onSelectPlace(place.id)}
-                      style={{
-                        background: "var(--card)",
-                        border: `1px solid ${active ? tColor : "var(--border)"}`,
-                        borderRadius: 7,
-                        padding: "6px 8px",
-                        cursor: clickable ? "pointer" : "default",
-                        transition: "border-color .15s",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontWeight: 700,
-                          color: "var(--ink)",
-                          fontSize: 12.5,
-                          lineHeight: 1.3,
-                        }}
-                      >
-                        {place.time ? `${place.time} · ` : ""}
-                        {place.name}
-                      </div>
-                      {place.memo && (
-                        <div
-                          style={{
-                            fontSize: 11.5,
-                            color: "var(--ink-soft)",
-                            marginTop: 2,
-                            lineHeight: 1.4,
-                            whiteSpace: "pre-line",
-                          }}
-                        >
-                          {place.memo}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                {byTeam[teamName].map((place) => (
+                  <TeamRow
+                    key={place.id}
+                    place={place}
+                    color={tColor}
+                    active={selectedPlaceId === place.id}
+                    onSelectPlace={onSelectPlace}
+                  />
+                ))}
               </div>
             </div>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function TeamRow({
+  place,
+  color,
+  active,
+  onSelectPlace,
+}: {
+  place: Place;
+  color: string;
+  active: boolean;
+  onSelectPlace: (id: string) => void;
+}) {
+  const clickable = place.showOnMap && place.lat != null && place.lng != null;
+  const ref = useActiveScroll(active);
+  return (
+    <div
+      ref={ref}
+      onClick={() => clickable && onSelectPlace(place.id)}
+      style={{
+        background: "var(--card)",
+        border: `1px solid ${active ? color : "var(--border)"}`,
+        borderRadius: 7,
+        padding: "6px 8px",
+        cursor: clickable ? "pointer" : "default",
+        transition: "border-color .15s",
+      }}
+    >
+      <div style={{ fontWeight: 700, color: "var(--ink)", fontSize: 12.5, lineHeight: 1.3 }}>
+        {place.time ? `${place.time} · ` : ""}
+        {place.name}
+      </div>
+      {place.memo && (
+        <div
+          style={{
+            fontSize: 11.5,
+            color: "var(--ink-soft)",
+            marginTop: 2,
+            lineHeight: 1.4,
+            whiteSpace: "pre-line",
+          }}
+        >
+          {place.memo}
+        </div>
+      )}
     </div>
   );
 }
