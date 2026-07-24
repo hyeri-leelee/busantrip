@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Day, MapProvider, Place, Trip } from "@/lib/trips";
+import { placeKind, type PlaceKind } from "@/lib/place";
 
 const CATEGORIES = ["식사", "카페", "명소", "숙소", "이동"];
 
@@ -57,6 +58,35 @@ export default function TripEditor({
           : d
       ),
     }));
+  }
+
+  // 구분(확정/선택사항/후보지/팀 분기) 변경
+  function setKind(placeIdx: number, kind: PlaceKind, current: Place) {
+    if (kind === "optional") {
+      patchPlace(placeIdx, {
+        status: "optional",
+        candidateGroup: undefined,
+        team: undefined,
+      });
+    } else if (kind === "candidate") {
+      patchPlace(placeIdx, {
+        status: "confirmed",
+        candidateGroup: current.candidateGroup || "후보",
+        team: undefined,
+      });
+    } else if (kind === "team") {
+      patchPlace(placeIdx, {
+        status: "confirmed",
+        candidateGroup: undefined,
+        team: current.team || "팀",
+      });
+    } else {
+      patchPlace(placeIdx, {
+        status: "confirmed",
+        candidateGroup: undefined,
+        team: undefined,
+      });
+    }
   }
 
   function addDay() {
@@ -443,6 +473,48 @@ export default function TripEditor({
                       }
                     />
                   </div>
+                </div>
+
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                  <div style={{ width: 140 }}>
+                    <div style={label}>구분</div>
+                    <select
+                      style={input}
+                      value={placeKind(place)}
+                      onChange={(e) =>
+                        setKind(j, e.target.value as PlaceKind, place)
+                      }
+                    >
+                      <option value="confirmed">확정</option>
+                      <option value="optional">선택사항</option>
+                      <option value="candidate">후보지</option>
+                      <option value="team">팀 분기</option>
+                    </select>
+                  </div>
+                  {placeKind(place) === "candidate" && (
+                    <div style={{ flex: "1 1 220px" }}>
+                      <div style={label}>후보 그룹명 (같은 이름끼리 묶임)</div>
+                      <input
+                        style={input}
+                        placeholder="예: 저녁 식사"
+                        value={place.candidateGroup ?? ""}
+                        onChange={(e) =>
+                          patchPlace(j, { candidateGroup: e.target.value })
+                        }
+                      />
+                    </div>
+                  )}
+                  {placeKind(place) === "team" && (
+                    <div style={{ flex: "1 1 220px" }}>
+                      <div style={label}>팀명 (연속 배치 시 나란히 묶임)</div>
+                      <input
+                        style={input}
+                        placeholder="예: 혜리 / 상민·유안"
+                        value={place.team ?? ""}
+                        onChange={(e) => patchPlace(j, { team: e.target.value })}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ marginTop: 8 }}>

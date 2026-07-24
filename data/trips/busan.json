@@ -1,22 +1,48 @@
 {
   "trip": {
     "title": "부산 여행",
+    "subtitle": "용인 출발 · 광안리 → 창원 → 해운대 → 영도 → 기장/울산",
     "days": [
       {
         "day": 1,
         "date": "2026-07-25",
         "label": "토",
+        "title": "출발 & 광안리의 밤",
         "places": [
-          { "id": "d1-1", "time": "12:00", "name": "용인", "category": "이동", "lat": null, "lng": null, "memo": "점심 먹고 출발 (4시간 30분 소요 예상)", "showOnMap": false },
-          { "id": "d1-2", "time": "17:00", "name": "부산 도착", "category": "이동", "lat": null, "lng": null, "memo": "", "showOnMap": false },
-          { "id": "d1-3", "time": "", "name": "광안리(광리단길)", "category": "명소", "lat": 35.1533, "lng": 129.1186, "memo": "상점가 구경, 해리단길이 더 볼거리 많음", "showOnMap": true },
-          { "id": "d1-4", "time": "", "name": "시즌스 광안점", "category": "카페", "lat": 35.1503, "lng": 129.1190, "memo": "부산 수영구 광안해변로255번길 40 1층 · 바다 위에 떠 있는 매장 (좌표 근사, 지도에서 확인 요망)", "showOnMap": true },
-          { "id": "d1-5", "time": "", "name": "광안비치랜드(광안리해수욕장)", "category": "명소", "lat": 35.1533, "lng": 129.1186, "memo": "", "showOnMap": true },
-          { "id": "d1-6", "time": "", "name": "서희스타힐스센텀프리모오피스텔 주차장", "category": "이동", "lat": 35.1691, "lng": 129.1306, "memo": "센텀시티 지역 근사 좌표", "showOnMap": false },
-          { "id": "d1-7", "time": "20:00", "name": "포켓몬 드론쇼", "category": "명소", "lat": 35.1533, "lng": 129.1186, "memo": "8시 보기", "showOnMap": true },
-          { "id": "d1-8", "time": "", "name": "하얏트 플레이스 부산연산", "category": "숙소", "lat": 35.1852, "lng": 129.0783, "memo": "체크인 276,200원 · 부산 연제구 중앙대로 1121 (좌표 근사, 지도에서 확인 요망)", "showOnMap": true },
-          { "id": "d1-9", "time": "18:00", "name": "맹구포차", "category": "식사", "lat": 35.1480, "lng": 129.1148, "memo": "평점 5.0, 로컬 감성 포차, 일찍 가는 걸 추천 · 부산 수영구 남천바다로 33번길 72 (검색 확인, 좌표는 근사)", "showOnMap": true },
-          { "id": "d1-10", "time": "18:00", "name": "간빠맥주 서면형제점", "category": "식사", "lat": 35.1577, "lng": 129.0594, "memo": "일본식 이자카야, 오픈 30분 내 만석 · 서면 지역 근사 좌표 (정확 주소 미확인)", "showOnMap": true }
+          { "id": "d1-1", "time": "11:00", "name": "용인 우리집", "category": "이동", "lat": null, "lng": null, "memo": "축구 하고 가볍게 점심 먹고 출발", "showOnMap": false },
+          { "id": "d1-2", "time": "", "name": "죽암휴게소", "category": "식사", "lat": null, "lng": null, "memo": "왕갈비탕", "showOnMap": false, "candidateGroup": "휴게소 점심" },
+          { "id": "d1-3", "time": "", "name": "황간휴게소", "category": "식사", "lat": null, "lng": null, "memo": "올갱이국밥", "showOnMap": false, "candidateGroup": "휴게소 점심" },
+          { "id": "d1-4", "time": "", "name": "금강휴게소", "category": "식사", "lat": null, "lng": null, "memo": "도리뱅뱅 정식", "showOnMap": false, "candidateGroup": "휴게소 점심" },
+          { "id": "d1-5", "time": "", "name": "화서휴게소", "category": "식사", "lat": null, "lng": null, "memo": "버섯전골 / 산채비빔밥", "showOnMap": false, "candidateGroup": "휴게소 점심" },
+          { "id": "d1-6", "time": "16:00", "name": "롯데백화점 부산본점 (서면)", "category": "명소", "lat": 35.1577, "lng": 129.0595, "memo": "포켓몬 느긋느긋 바캉스 팝업스토어\n→ 도착하면 웨이팅 등록 후 입장\n· 기간: 2026.07.17(금)~08.09(일)\n· 지하1층 Kinetic Stage / 9층 엘아레나 카드게임 체험존\n· 운영(금·토·일·공휴일): 10:30~20:30\n· 스탬프 랠리 대지 배부/스탬프: 10층 롯데시네마 매표소 앞", "showOnMap": true },
+          { "id": "d1-7", "time": "17:30", "name": "하얏트 플레이스 부산연산", "category": "숙소", "lat": 35.1852, "lng": 129.0783, "memo": "호텔 체크인 / 조식 신청하기 · 부산 연제구 중앙대로 1121 (좌표 근사)", "showOnMap": true },
+          { "id": "d1-8", "time": "19:00", "name": "저녁 식사 or 배달음식", "category": "식사", "lat": null, "lng": null, "memo": "상호 미정", "showOnMap": false },
+          { "id": "d1-9", "time": "21:30~22:20", "name": "더베이101 요트투어 (예약완료)", "category": "명소", "lat": 35.1583, "lng": 129.1424, "memo": "(By car) 요트투어 예약 확인 (해운대 더베이 요트탈래)\n· 주소: 부산 해운대구 우동 747-7\n· 해질 때쯤 타면 노을+야경 다 잡힘 (마이리얼트립 제휴 예약 가능)\n· 가격 대비 만족도 높음, 21:30 귀항", "showOnMap": true },
+          { "id": "d1-10", "time": "22:00", "name": "광안리 드론쇼", "category": "명소", "lat": 35.1533, "lng": 129.1186, "memo": "포켓몬 느긋느긋 바캉스 in 광안리 (포켓몬 30주년 특별 공연)\n1회 20:00 / 2회 22:00, 회차당 약 12분 이상", "showOnMap": true },
+          { "id": "d1-11", "time": "23:00", "name": "하얏트 플레이스 부산연산", "category": "숙소", "lat": 35.1852, "lng": 129.0783, "memo": "취침", "showOnMap": false }
+        ]
+      },
+      {
+        "day": 2,
+        "date": "2026-07-26",
+        "label": "일",
+        "title": "광안리 & 창원",
+        "places": [
+          { "id": "d2-1", "time": "08:00", "name": "하얏트 플레이스 부산연산", "category": "식사", "lat": 35.1852, "lng": 129.0783, "memo": "아침 식사 · 성인 20,000원, 어린이 10,000원", "showOnMap": true },
+          { "id": "d2-2", "time": "09:00", "name": "연산역 → 광안역", "category": "이동", "lat": null, "lng": null, "memo": "(By Subway)", "showOnMap": false },
+          { "id": "d2-3", "time": "", "name": "센텀프리모오피스텔", "category": "이동", "lat": 35.1691, "lng": 129.1306, "memo": "차로 이동할 경우 주차장 이용 (센텀시티 지역 근사 좌표)", "showOnMap": true, "status": "optional" },
+          { "id": "d2-4", "time": "10:00", "name": "광안리 (광리단길)", "category": "명소", "lat": 35.1533, "lng": 129.1186, "memo": "광안역 3번 출구에서 도보 이동 : 상점가 구경\n(매우 짧은 편, 해리단길이 더 볼거리가 많음)", "showOnMap": true },
+          { "id": "d2-5", "time": "12:00", "name": "안목 (금련산역)", "category": "식사", "lat": 35.1516, "lng": 129.1131, "memo": "1순위(✅) · 좌표 근사", "showOnMap": true, "candidateGroup": "점심 식사" },
+          { "id": "d2-6", "time": "", "name": "은해갈치 (광안역)", "category": "식사", "lat": 35.1533, "lng": 129.1186, "memo": "좌표 근사", "showOnMap": true, "candidateGroup": "점심 식사" },
+          { "id": "d2-7", "time": "13:30", "name": "바닷마을 과자점", "category": "카페", "lat": 35.1499, "lng": 129.1101, "memo": "금련산역에서 이동, 일찍 방문해야 케이크 가능\n캐치테이블 원격 예약 후 방문(12:00 예약 오픈), 추천메뉴: 생토노레 · 좌표 근사", "showOnMap": true },
+          { "id": "d2-8", "time": "", "name": "서희와제과 광안점 / 무슈뱅상 / 에타리", "category": "카페", "lat": 35.1531, "lng": 129.1186, "memo": "바닷마을 과자점 실패할 경우! 빵집 · 좌표 근사", "showOnMap": true, "candidateGroup": "바닷마을 과자점 대안" },
+          { "id": "d2-9", "time": "", "name": "시즌즈 광안점", "category": "카페", "lat": 35.1503, "lng": 129.1190, "memo": "바닷마을 과자점 실패할 경우! 카페 · 좌표 근사", "showOnMap": true, "candidateGroup": "바닷마을 과자점 대안" },
+          { "id": "d2-10", "time": "15:00", "name": "창원 승아네집", "category": "이동", "lat": 35.2887, "lng": 128.6474, "memo": "도착 · 창원감계푸르지오아파트 108동 804호", "showOnMap": false },
+          { "id": "d2-11", "time": "", "name": "창원과학체험관", "category": "명소", "lat": 35.2270, "lng": 128.6790, "memo": "일요일에는 주차자리가 없어서 갓길에 대는 걸 추천! 공원 주차하고 걸어서 이용해도 좋음 · 좌표 근사", "showOnMap": false, "team": "상민·유안" },
+          { "id": "d2-12", "time": "", "name": "창원도서관", "category": "명소", "lat": 35.2280, "lng": 128.6800, "memo": "좌표 근사", "showOnMap": false, "team": "상민·유안" },
+          { "id": "d2-13", "time": "", "name": "피어어피어 (김해)", "category": "명소", "lat": 35.2286, "lng": 128.8894, "memo": "좌표 근사", "showOnMap": false, "team": "혜리" },
+          { "id": "d2-14", "time": "", "name": "진해 (초밥 포장)", "category": "명소", "lat": 35.1533, "lng": 128.6617, "memo": "좌표 근사", "showOnMap": false, "team": "혜리" },
+          { "id": "d2-15", "time": "18:00", "name": "창원 승아네집", "category": "숙소", "lat": 35.2887, "lng": 128.6474, "memo": "휴식 & 취침", "showOnMap": false }
         ],
         "routes": [
           {
@@ -30,80 +56,80 @@
         ]
       },
       {
-        "day": 2,
-        "date": "2026-07-26",
-        "label": "일",
-        "places": [
-          { "id": "d2-1", "time": "", "name": "하얏트 플레이스 부산연산", "category": "숙소", "lat": 35.1852, "lng": 129.0783, "memo": "부산 연제구 중앙대로 1121 (좌표 근사)", "showOnMap": true },
-          { "id": "d2-2", "time": "13:30", "name": "바닷마을과자점", "category": "카페", "lat": 35.1637, "lng": 129.1638, "memo": "일찍 방문해야 케이크 가능, 캐치테이블 원격예약(12시 오픈), 추천메뉴 생토노레 · 좌표 확인 필요", "showOnMap": true },
-          { "id": "d2-3", "time": "12:00", "name": "창원 도착", "category": "이동", "lat": 35.2281, "lng": 128.6811, "memo": "", "showOnMap": false },
-          { "id": "d2-4", "time": "", "name": "창원 맛집", "category": "식사", "lat": null, "lng": null, "memo": "점심식사 · 상호 및 좌표 확인 필요", "showOnMap": true },
-          { "id": "d2-5", "time": "18:00", "name": "창원 승아네집", "category": "식사", "lat": 35.2887, "lng": 128.6474, "memo": "저녁식사, 창원감계푸르지오아파트 108동 804호 · 좌표 확인 필요", "showOnMap": true }
-        ]
-      },
-      {
         "day": 3,
         "date": "2026-07-27",
         "label": "월",
+        "title": "창원 → 해운대",
         "places": [
           { "id": "d3-1", "time": "10:30", "name": "창원 출발", "category": "이동", "lat": null, "lng": null, "memo": "", "showOnMap": false },
           { "id": "d3-2", "time": "11:30", "name": "부산 도착", "category": "이동", "lat": null, "lng": null, "memo": "", "showOnMap": false },
-          { "id": "d3-3", "time": "12:00", "name": "거대갈비(본관)", "category": "식사", "lat": 35.1618, "lng": 129.1587, "memo": "점심 특선 11:30~15:00, 전화예약 051-746-0037 · 부산 해운대구 달맞이길 22 (검색 확인, 좌표는 근사)", "showOnMap": true },
-          { "id": "d3-4", "time": "13:00", "name": "오엘스 에스프레소바", "category": "카페", "lat": 35.1638, "lng": 129.1701, "memo": "뷰맛집, 부산 해운대구 달맞이길117번나길 55 (검색 확인)", "showOnMap": true },
-          { "id": "d3-5", "time": "14:00", "name": "시그니엘 부산", "category": "숙소", "lat": 35.1657, "lng": 129.1493, "memo": "주차/체크인 · 좌표 확인 필요", "showOnMap": true },
-          { "id": "d3-6", "time": "14:30", "name": "그랜드 조선 부산(4층 전시장)", "category": "명소", "lat": 35.1601, "lng": 129.1607, "memo": "워너브롱크호스트 전, 그라운드 시소 예약, 2026.05.22~08.31, 10~19시 · 좌표 확인 필요", "showOnMap": true },
-          { "id": "d3-7", "time": "16:00", "name": "시그니엘 부산 인피니티풀(6층)", "category": "명소", "lat": 35.1657, "lng": 129.1493, "memo": "9~22시, 성수기 1일 1회 제한, 수모/캡모자 필수", "showOnMap": true },
-          { "id": "d3-8", "time": "19:00", "name": "더베이101 요트투어", "category": "명소", "lat": 35.1583, "lng": 129.1424, "memo": "122,000원 예약완료, 19시 승선 시 노을+야경", "showOnMap": true },
-          { "id": "d3-9", "time": "18:00", "name": "수변최고돼지국밥 해운대점", "category": "식사", "lat": 35.1636, "lng": 129.1637, "memo": "저녁식사, 부산 해운대구 구남로 39 (검색 확인)", "showOnMap": true },
-          { "id": "d3-10", "time": "19:00", "name": "해운대 전통시장", "category": "명소", "lat": 35.1633, "lng": 129.1633, "memo": "", "showOnMap": true }
+          { "id": "d3-3", "time": "12:00", "name": "거대갈비 (본관)", "category": "식사", "lat": 35.1618, "lng": 129.1587, "memo": "점심식사 (점심 특선 11:30~15:00)\n전화 예약 가능 (051-746-0037) · 좌표 근사", "showOnMap": true },
+          { "id": "d3-4", "time": "13:00", "name": "오엘스 에스프레소바", "category": "카페", "lat": 35.1638, "lng": 129.1701, "memo": "뷰맛집 · 좌표 근사", "showOnMap": true, "candidateGroup": "카페 (뷰맛집)" },
+          { "id": "d3-5", "time": "", "name": "온더힐", "category": "카페", "lat": 35.1636, "lng": 129.1710, "memo": "뷰맛집 (오엘스는 아이 음료가 없음) · 좌표 근사", "showOnMap": true, "candidateGroup": "카페 (뷰맛집)" },
+          { "id": "d3-6", "time": "14:00", "name": "시그니엘 부산", "category": "숙소", "lat": 35.1657, "lng": 129.1493, "memo": "주차 - 체크인 · 좌표 근사", "showOnMap": true },
+          { "id": "d3-7", "time": "14:30", "name": "그랜드 조선 호텔 (4층 전시장)", "category": "명소", "lat": 35.1601, "lng": 129.1607, "memo": "워너브롱크호스트 전 (도보로 이동)\n· 예약: 그라운드 시소\n· 기간: 2026.05.22~08.31, 10:00~19:00\n· 전시장 방문하여 성함/연락처/예매처 확인 후 이용, 주차 지원 없음", "showOnMap": true },
+          { "id": "d3-8", "time": "16:00", "name": "시그니엘 부산 인피니티풀 (6층)", "category": "명소", "lat": 35.1657, "lng": 129.1493, "memo": "· 09:00~22:00\n· 성수기(7~8월) 1일 1회 횟수 제한 운영\n· 야외수영장 이용 시 수모 또는 캡모자 착용 필수, 전 연령 입장 가능", "showOnMap": true },
+          { "id": "d3-9", "time": "18:00", "name": "수변최고돼지국밥 해운대점", "category": "식사", "lat": 35.1636, "lng": 129.1637, "memo": "저녁식사 · [미리 줄서기] 테이블링 원격 줄서기 가능", "showOnMap": true },
+          { "id": "d3-10", "time": "19:00", "name": "해운대 전통시장", "category": "명소", "lat": 35.1633, "lng": 129.1633, "memo": "꼼장어", "showOnMap": true }
         ]
       },
       {
         "day": 4,
         "date": "2026-07-28",
         "label": "화",
+        "title": "동백섬 & 해변열차",
         "places": [
-          { "id": "d4-1", "time": "08:00", "name": "시그니엘 부산", "category": "식사", "lat": 35.1657, "lng": 129.1493, "memo": "전날 미리 사가기, 가벼운 아침식사", "showOnMap": true },
-          { "id": "d4-2", "time": "10:00", "name": "시그니엘 부산 키즈라운지", "category": "명소", "lat": 35.1657, "lng": 129.1493, "memo": "10세 이하, 평일 10~18시", "showOnMap": true },
-          { "id": "d4-3", "time": "11:30", "name": "동백섬", "category": "명소", "lat": 35.1544, "lng": 129.1494, "memo": "산책", "showOnMap": true },
-          { "id": "d4-4", "time": "13:00", "name": "프레제 본점(마린시티)", "category": "식사", "lat": 35.1554, "lng": 129.1443, "memo": "브런치 뷔페, 부산 해운대구 마린시티2로 33 (검색 확인)", "showOnMap": true },
-          { "id": "d4-5", "time": "14:00", "name": "모모스커피 마린시티점", "category": "카페", "lat": 35.1556, "lng": 129.1438, "memo": "휴식 · 마린시티 지역 근사 좌표", "showOnMap": true },
-          { "id": "d4-6", "time": "15:00", "name": "미포정거장→송정정거장", "category": "이동", "lat": 35.1596, "lng": 129.1685, "memo": "해변열차 탑승 (예약완료)", "showOnMap": true },
-          { "id": "d4-7", "time": "", "name": "해동용궁사", "category": "명소", "lat": 35.1885, "lng": 129.2231, "memo": "간단 주전부리 (잘 알려진 랜드마크 좌표)", "showOnMap": true },
-          { "id": "d4-8", "time": "", "name": "국립수산과학원", "category": "명소", "lat": 35.1908, "lng": 129.2078, "memo": "부산 기장군 소재 (근사 좌표)", "showOnMap": true },
-          { "id": "d4-9", "time": "18:20", "name": "송정정거장→청사포정거장", "category": "이동", "lat": 35.1789, "lng": 129.2007, "memo": "해변열차 탑승", "showOnMap": true },
-          { "id": "d4-10", "time": "19:30", "name": "청사포→미포 스카이캡슐", "category": "명소", "lat": 35.1699, "lng": 129.1859, "memo": "해운대블루라인파크, 사전예약필수(한달전), 일몰시간대 매진주의 (예약완료)", "showOnMap": true },
-          { "id": "d4-11", "time": "20:00", "name": "참가자미 해운대마린시티점", "category": "식사", "lat": 35.1558, "lng": 129.1441, "memo": "저녁식사, 예약문의 0507-1364-3539 · 마린시티 지역 근사 좌표", "showOnMap": true },
-          { "id": "d4-12", "time": "21:00", "name": "시그니엘 부산", "category": "숙소", "lat": 35.1657, "lng": 129.1493, "memo": "숙소 귀가", "showOnMap": true }
+          { "id": "d4-1", "time": "08:00", "name": "시그니엘 부산", "category": "식사", "lat": 35.1657, "lng": 129.1493, "memo": "전날 미리 사가기, 가볍게 아침식사", "showOnMap": true },
+          { "id": "d4-2", "time": "10:00", "name": "시그니엘 부산 키즈 라운지", "category": "명소", "lat": 35.1657, "lng": 129.1493, "memo": "쉬는 시간 · 키즈 라운지 이용\n· 구성: Library & Block Zone, Activity Play Zone, 직업 체험 Zone\n· 10세 이하(보호자 동반), 평일 10:00~18:00", "showOnMap": true },
+          { "id": "d4-3", "time": "11:30", "name": "동백섬", "category": "명소", "lat": 35.1544, "lng": 129.1494, "memo": "동백섬 산책", "showOnMap": true },
+          { "id": "d4-4", "time": "13:00", "name": "프레제 (해운대 두산위브더제니스)", "category": "식사", "lat": 35.1690, "lng": 129.1380, "memo": "산책 후 점심 식사 (브런치 뷔페 운영) · 좌표 근사", "showOnMap": true },
+          { "id": "d4-5", "time": "14:00", "name": "모모스커피 (마린시티점)", "category": "카페", "lat": 35.1556, "lng": 129.1438, "memo": "카페에서 휴식 · 좌표 근사", "showOnMap": true },
+          { "id": "d4-6", "time": "15:00~15:30", "name": "미포정거장 → 송정정거장", "category": "이동", "lat": 35.1596, "lng": 129.1685, "memo": "해변열차 탑승 (예약완료)", "showOnMap": true },
+          { "id": "d4-7", "time": "", "name": "해동용궁사", "category": "명소", "lat": 35.1885, "lng": 129.2231, "memo": "간단한 주전부리 사먹기 (송정동 핫도그, 꽈배기 등)", "showOnMap": true, "status": "optional" },
+          { "id": "d4-8", "time": "", "name": "국립수산과학원", "category": "명소", "lat": 35.1908, "lng": 129.2078, "memo": "좌표 근사", "showOnMap": true, "status": "optional" },
+          { "id": "d4-9", "time": "18:20~18:30", "name": "송정정거장 → 청사포정거장", "category": "이동", "lat": 35.1789, "lng": 129.2007, "memo": "해변열차 탑승", "showOnMap": true },
+          { "id": "d4-10", "time": "19:30", "name": "청사포 → 미포 스카이캡슐 (예약완료)", "category": "명소", "lat": 35.1699, "lng": 129.1859, "memo": "해운대블루라인파크 스카이캡슐 (2km 구간)\n[한달 전 사전예약 필수] 일몰 시간대 빨리 매진", "showOnMap": true },
+          { "id": "d4-11", "time": "20:00", "name": "참가자미 (부산 마린시티점)", "category": "식사", "lat": 35.1558, "lng": 129.1441, "memo": "저녁식사 · 예약 가능한지 문의 (0507-1364-3539)\n영업시간 11:00~22:00, 브레이크타임 14:30~16:30 · 좌표 근사", "showOnMap": true },
+          { "id": "d4-12", "time": "21:00", "name": "시그니엘 부산", "category": "숙소", "lat": 35.1657, "lng": 129.1493, "memo": "숙소 귀가 및 휴식", "showOnMap": false }
         ]
       },
       {
         "day": 5,
         "date": "2026-07-29",
         "label": "수",
+        "title": "영도 & 파크하얏트",
         "places": [
-          { "id": "d5-1", "time": "08:00", "name": "시그니엘 부산 '더 뷰' 뷔페", "category": "식사", "lat": 35.1657, "lng": 129.1493, "memo": "5층, 6:30~10시 운영", "showOnMap": true },
-          { "id": "d5-2", "time": "11:00", "name": "시그니엘 부산", "category": "숙소", "lat": 35.1657, "lng": 129.1493, "memo": "체크아웃", "showOnMap": true },
-          { "id": "d5-3", "time": "", "name": "용두산공원 공영주차장", "category": "이동", "lat": 35.1005, "lng": 129.0324, "memo": "호텔에서 30~40분", "showOnMap": true },
-          { "id": "d5-4", "time": "12:00", "name": "이재모 피자(본점2)", "category": "식사", "lat": 35.0996, "lng": 129.0303, "memo": "캐치테이블 예약완료(7/22 예약) · 부산 중구 광복중앙로 31 인근 (검색 확인, 좌표는 근사)", "showOnMap": true },
-          { "id": "d5-5", "time": "13:30", "name": "흰여울마을 절영해안산책로 주차장", "category": "이동", "lat": 35.0763, "lng": 129.0330, "memo": "노상공영주차장, 흰여울문화마을 좌표 확정", "showOnMap": true },
-          { "id": "d5-6", "time": "", "name": "흰여울문화마을+해안산책로", "category": "명소", "lat": 35.0763, "lng": 129.0330, "memo": "이송도전망대→무지개계단→흰여울해안터널", "showOnMap": true },
-          { "id": "d5-7", "time": "14:00", "name": "카페 변호인", "category": "카페", "lat": 35.0758, "lng": 129.0325, "memo": "산책로 옆 오션뷰 · 좌표 확인 필요", "showOnMap": true },
-          { "id": "d5-8", "time": "", "name": "국립해양박물관 (선택)", "category": "명소", "lat": 35.0678, "lng": 129.0904, "memo": "18시까지 운영", "showOnMap": true },
-          { "id": "d5-9", "time": "15:00", "name": "파크하얏트 부산", "category": "숙소", "lat": 35.1571, "lng": 129.1439, "memo": "체크인 · 좌표 확인 필요", "showOnMap": true },
-          { "id": "d5-10", "time": "16:00", "name": "파크하얏트 부산 실내수영장", "category": "명소", "lat": 35.1571, "lng": 129.1439, "memo": "4층, 광안대교뷰, 6~22시(브레이크 11~12시)", "showOnMap": true },
-          { "id": "d5-11", "time": "17:00", "name": "저녁식사", "category": "식사", "lat": null, "lng": null, "memo": "상호 미정", "showOnMap": false }
+          { "id": "d5-1", "time": "08:00", "name": "시그니엘 부산 '더 뷰' (5층 뷔페)", "category": "식사", "lat": 35.1657, "lng": 129.1493, "memo": "뷔페 레스토랑 '더 뷰(The View)' · 06:30~10:00 운영", "showOnMap": true },
+          { "id": "d5-2", "time": "11:00", "name": "시그니엘 부산", "category": "숙소", "lat": 35.1657, "lng": 129.1493, "memo": "체크아웃", "showOnMap": false },
+          { "id": "d5-3", "time": "", "name": "용두산공원 공영주차장", "category": "이동", "lat": 35.1005, "lng": 129.0324, "memo": "호텔에서 용두산/영도까지 차로 30~40분\n이재모 피자 주차장 따로 없음 → 용두산공원 공영주차장에 대고 이동", "showOnMap": true },
+          { "id": "d5-4", "time": "12:00", "name": "이재모 피자 (본점2) (예약완료)", "category": "식사", "lat": 35.0996, "lng": 129.0303, "memo": "점심식사 캐치테이블 예약 (일주일 전 예약, 7/22 예약 완료) · 좌표 근사", "showOnMap": true },
+          { "id": "d5-5", "time": "13:30", "name": "흰여울마을 (주차장)", "category": "이동", "lat": 35.0763, "lng": 129.0330, "memo": "절영해안산책로 앞 노상공영주차장 이용", "showOnMap": true },
+          { "id": "d5-6", "time": "", "name": "흰여울마을 + 해안산책로", "category": "명소", "lat": 35.0763, "lng": 129.0330, "memo": "도보로 영도 진입\n마을 입구 → 이송도전망대 → 무지개(피아노)계단 → 흰여울해안터널까지 걷고 돌아오는 구간", "showOnMap": true },
+          { "id": "d5-7", "time": "14:00", "name": "흰여울마을 카페 (카페 변호인)", "category": "카페", "lat": 35.0758, "lng": 129.0325, "memo": "산책로 옆 오션뷰 · 좌표 근사", "showOnMap": true },
+          { "id": "d5-8", "time": "", "name": "영도 국립해양박물관", "category": "명소", "lat": 35.0678, "lng": 129.0904, "memo": "18:00까지 운영", "showOnMap": true, "status": "optional" },
+          { "id": "d5-9", "time": "15:00", "name": "파크하얏트 부산", "category": "숙소", "lat": 35.1571, "lng": 129.1439, "memo": "체크인 · 좌표 근사", "showOnMap": true },
+          { "id": "d5-10", "time": "16:00", "name": "파크하얏트 부산 실내수영장", "category": "명소", "lat": 35.1571, "lng": 129.1439, "memo": "4층 실내 수영장 · 20m 길이, 광안대교 뷰\n운영 06:00~22:00 (브레이크타임 11:00~12:00)", "showOnMap": true },
+          { "id": "d5-11", "time": "17:00", "name": "딤타오 본점", "category": "식사", "lat": 35.1636, "lng": 129.1600, "memo": "저녁식사 (테이블링 웨이팅) · 원격 줄서기 11:40~20:30 · 좌표 근사", "showOnMap": true }
         ]
       },
       {
         "day": 6,
         "date": "2026-07-30",
         "label": "목",
+        "title": "기장 → 울산 → 귀가",
         "places": [
-          { "id": "d6-1", "time": "", "name": "기장해녀촌 공영주차장", "category": "명소", "lat": 35.2308, "lng": 129.2144, "memo": "기장 대변항 지역 근사 좌표", "showOnMap": true },
-          { "id": "d6-2", "time": "", "name": "점심식사", "category": "식사", "lat": null, "lng": null, "memo": "상호 미정", "showOnMap": false },
-          { "id": "d6-3", "time": "", "name": "고래박물관", "category": "명소", "lat": 35.4919, "lng": 129.3762, "memo": "울산 여행 · 좌표 확인 필요", "showOnMap": true },
-          { "id": "d6-4", "time": "", "name": "용인 출발", "category": "이동", "lat": null, "lng": null, "memo": "", "showOnMap": false }
+          { "id": "d6-1", "time": "", "name": "파크하얏트 부산 (아침식사)", "category": "식사", "lat": null, "lng": null, "memo": "조식", "showOnMap": false },
+          { "id": "d6-2", "time": "10:30", "name": "파크하얏트 부산", "category": "숙소", "lat": 35.1571, "lng": 129.1439, "memo": "체크아웃", "showOnMap": false },
+          { "id": "d6-3", "time": "11:30", "name": "기장해녀촌 공영주차장", "category": "식사", "lat": 35.2308, "lng": 129.2144, "memo": "기장해녀촌 포장마차처럼 여러 집이 붙어 있는 곳 · 좌표 근사", "showOnMap": true, "candidateGroup": "기장 점심 (해녀촌/횟집)" },
+          { "id": "d6-4", "time": "", "name": "연화리해녀촌 제주부씨 [추천]", "category": "식사", "lat": 35.2385, "lng": 129.2180, "memo": "월드컵 방파제 쪽 해녀촌 추천 (해물 포장마차촌) · 좌표 근사", "showOnMap": true, "candidateGroup": "기장 점심 (해녀촌/횟집)" },
+          { "id": "d6-5", "time": "", "name": "월전횟집", "category": "식사", "lat": 35.2050, "lng": 129.2230, "memo": "바다장어집 · 좌표 근사", "showOnMap": true, "candidateGroup": "기장 점심 (해녀촌/횟집)" },
+          { "id": "d6-6", "time": "", "name": "대성갈치", "category": "식사", "lat": 35.2390, "lng": 129.2170, "memo": "멸치쌈밥 & 갈치구이 · 좌표 근사", "showOnMap": true, "candidateGroup": "기장 점심 (해녀촌/횟집)" },
+          { "id": "d6-7", "time": "12:30", "name": "박물관 카페 알라딘", "category": "카페", "lat": 35.1930, "lng": 129.2270, "memo": "좌표 근사", "showOnMap": true, "candidateGroup": "기장 카페" },
+          { "id": "d6-8", "time": "", "name": "칠암사계", "category": "카페", "lat": 35.1750, "lng": 129.2560, "memo": "좌표 근사", "showOnMap": true, "candidateGroup": "기장 카페" },
+          { "id": "d6-9", "time": "14:30", "name": "장생포 고래박물관", "category": "명소", "lat": 35.4919, "lng": 129.3762, "memo": "기장에서 울산 1시간 소요 · 운영 09:00~18:00", "showOnMap": true },
+          { "id": "d6-10", "time": "16:00", "name": "울산 → 용인", "category": "이동", "lat": null, "lng": null, "memo": "출발", "showOnMap": false },
+          { "id": "d6-11", "time": "19:00", "name": "휴게소", "category": "이동", "lat": null, "lng": null, "memo": "", "showOnMap": false },
+          { "id": "d6-12", "time": "20:30", "name": "용인 우리집", "category": "이동", "lat": null, "lng": null, "memo": "도착", "showOnMap": false }
         ]
       }
     ]

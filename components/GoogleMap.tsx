@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Day } from "@/lib/trips";
 import { dayColor } from "@/lib/colors";
+import { placeKind } from "@/lib/place";
 
 declare global {
   interface Window {
@@ -82,31 +83,85 @@ export default function GoogleMap({
         (p) => p.showOnMap && p.lat != null && p.lng != null
       );
       const linePath: any[] = [];
+      let order = 0; // 확정 장소만 순번을 매긴다
 
-      places.forEach((place, index) => {
+      // 후보지 마커용 다이아몬드 심볼
+      const DIAMOND = "M 0,-1 1,0 0,1 -1,0 z";
+
+      places.forEach((place) => {
         const pos = { lat: place.lat as number, lng: place.lng as number };
         bounds.extend(pos);
-        linePath.push(pos);
         totalPlaces++;
 
-        const marker = new window.google.maps.Marker({
-          map: mapInstance,
-          position: pos,
-          label: {
-            text: String(index + 1),
-            color: "#fff",
-            fontSize: "12px",
-            fontWeight: "700",
-          },
-          icon: {
-            path: window.google.maps.SymbolPath.CIRCLE,
-            scale: 13,
-            fillColor: color,
-            fillOpacity: 1,
-            strokeColor: "#fff",
-            strokeWeight: 2,
-          },
-        });
+        const kind = placeKind(place);
+        let markerOptions: any;
+        if (kind === "confirmed") {
+          order++;
+          linePath.push(pos);
+          markerOptions = {
+            map: mapInstance,
+            position: pos,
+            label: {
+              text: String(order),
+              color: "#fff",
+              fontSize: "12px",
+              fontWeight: "700",
+            },
+            icon: {
+              path: window.google.maps.SymbolPath.CIRCLE,
+              scale: 13,
+              fillColor: color,
+              fillOpacity: 1,
+              strokeColor: "#fff",
+              strokeWeight: 2,
+            },
+          };
+        } else if (kind === "optional") {
+          // 선택사항: 점선 느낌의 속 빈 원(순번 없음)
+          markerOptions = {
+            map: mapInstance,
+            position: pos,
+            icon: {
+              path: window.google.maps.SymbolPath.CIRCLE,
+              scale: 9,
+              fillColor: color,
+              fillOpacity: 0.2,
+              strokeColor: color,
+              strokeWeight: 2,
+            },
+          };
+        } else if (kind === "team") {
+          // 팀 분기: 사각(순번 없음)
+          markerOptions = {
+            map: mapInstance,
+            position: pos,
+            icon: {
+              path:
+                "M -1,-1 1,-1 1,1 -1,1 z",
+              scale: 9,
+              fillColor: color,
+              fillOpacity: 0.6,
+              strokeColor: "#fff",
+              strokeWeight: 2,
+            },
+          };
+        } else {
+          // 후보지: 다이아몬드(순번 없음)
+          markerOptions = {
+            map: mapInstance,
+            position: pos,
+            icon: {
+              path: DIAMOND,
+              scale: 11,
+              fillColor: color,
+              fillOpacity: 0.85,
+              strokeColor: "#fff",
+              strokeWeight: 2,
+            },
+          };
+        }
+
+        const marker = new window.google.maps.Marker(markerOptions);
 
         const info = new window.google.maps.InfoWindow({ content: place.name });
         marker.addListener("click", () =>

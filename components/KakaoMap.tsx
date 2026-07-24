@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Day } from "@/lib/trips";
 import { dayColor } from "@/lib/colors";
+import { placeKind } from "@/lib/place";
 
 declare global {
   interface Window {
@@ -11,6 +12,22 @@ declare global {
 }
 
 type MarkerEntry = { position: any; el: HTMLDivElement };
+
+// 후보지 마커 안에 넣을 카테고리 아이콘
+function categoryEmoji(category?: string): string {
+  switch (category) {
+    case "식사":
+      return "🍽";
+    case "카페":
+      return "☕";
+    case "숙소":
+      return "🏨";
+    case "이동":
+      return "🚗";
+    default:
+      return "📍";
+  }
+}
 
 export default function KakaoMap({
   days,
@@ -79,14 +96,14 @@ export default function KakaoMap({
         (p: any) => p.showOnMap && p.lat && p.lng
       );
       const linePath: any[] = [];
+      let order = 0; // 확정 장소만 순번을 매긴다
 
-      places.forEach((place: any, index: number) => {
+      places.forEach((place: any) => {
         const pos = new window.kakao.maps.LatLng(place.lat, place.lng);
         bounds.extend(pos);
-        linePath.push(pos);
         totalPlaces++;
 
-        const order = index + 1;
+        const kind = placeKind(place);
 
         const wrapper = document.createElement("div");
         wrapper.style.position = "relative";
@@ -95,20 +112,56 @@ export default function KakaoMap({
         wrapper.style.alignItems = "center";
         wrapper.style.cursor = "pointer";
 
+        // 구분별 마커: 확정=번호 원 / 선택사항=점선 빈 원 / 후보지=아이콘 사각
         const badge = document.createElement("div");
-        badge.innerText = String(order);
-        badge.style.width = "26px";
-        badge.style.height = "26px";
-        badge.style.borderRadius = "50%";
-        badge.style.background = color;
-        badge.style.color = "#fff";
-        badge.style.fontSize = "13px";
-        badge.style.fontWeight = "700";
         badge.style.display = "flex";
         badge.style.alignItems = "center";
         badge.style.justifyContent = "center";
-        badge.style.border = "2px solid #fff";
         badge.style.boxShadow = "0 1px 4px rgba(0,0,0,0.3)";
+        if (kind === "confirmed") {
+          order++;
+          linePath.push(pos);
+          badge.innerText = String(order);
+          badge.style.width = "26px";
+          badge.style.height = "26px";
+          badge.style.borderRadius = "50%";
+          badge.style.background = color;
+          badge.style.color = "#fff";
+          badge.style.fontSize = "13px";
+          badge.style.fontWeight = "700";
+          badge.style.border = "2px solid #fff";
+        } else if (kind === "optional") {
+          badge.innerText = "선택";
+          badge.style.padding = "0 7px";
+          badge.style.height = "22px";
+          badge.style.borderRadius = "11px";
+          badge.style.background = "#fff";
+          badge.style.color = color;
+          badge.style.fontSize = "10.5px";
+          badge.style.fontWeight = "700";
+          badge.style.border = `2px dashed ${color}`;
+        } else if (kind === "team") {
+          // 팀 분기: 팀명 라벨
+          badge.innerText = place.team || "팀";
+          badge.style.padding = "0 8px";
+          badge.style.height = "22px";
+          badge.style.borderRadius = "6px";
+          badge.style.background = "#fff";
+          badge.style.color = color;
+          badge.style.fontSize = "10.5px";
+          badge.style.fontWeight = "700";
+          badge.style.border = `2px solid ${color}`;
+        } else {
+          // 후보지
+          badge.innerText = categoryEmoji(place.category);
+          badge.style.width = "24px";
+          badge.style.height = "24px";
+          badge.style.borderRadius = "7px";
+          badge.style.background = color;
+          badge.style.color = "#fff";
+          badge.style.fontSize = "13px";
+          badge.style.border = "2px solid #fff";
+        }
 
         const tooltip = document.createElement("div");
         tooltip.innerText = place.name;

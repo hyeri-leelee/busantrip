@@ -6,7 +6,8 @@ import KakaoMap from "@/components/KakaoMap";
 import GoogleMap from "@/components/GoogleMap";
 import { getDistanceKm, estimateDriveMinutes } from "@/lib/geo";
 import { dayColor } from "@/lib/colors";
-import type { Trip, Day } from "@/lib/trips";
+import { placeKind } from "@/lib/place";
+import type { Trip, Day, Place } from "@/lib/trips";
 
 // "2026-07-10" -> "7/10"
 function shortDate(date: string): string {
@@ -349,7 +350,8 @@ function DayRow({
   );
 }
 
-/* ── 선택된 날짜의 장소 카드 목록 ── */
+/* ── 선택된 날짜의 장소 카드 목록 ──
+   확정: 순번 카드 / 선택사항: 점선 카드 / 후보지: 그룹 박스 로 구분해 렌더한다. */
 function PlaceCards({
   day,
   color,
@@ -361,12 +363,13 @@ function PlaceCards({
   selectedPlaceId: string | null;
   onSelectPlace: (id: string) => void;
 }) {
-  // 지도 마커와 동일한 순서 번호 + 이동 거리/시간 계산
+  // 순번·이동 거리/시간은 "확정" 장소만 대상으로 계산한다(선택사항·후보지는 제외).
   const orderByPlaceId: Record<string, number> = {};
   const travelByPlaceId: Record<string, { km: number; min: number }> = {};
   let order = 0;
   let last: { lat: number; lng: number } | null = null;
   day.places.forEach((place) => {
+    if (placeKind(place) !== "confirmed") return;
     if (place.showOnMap && place.lat != null && place.lng != null) {
       orderByPlaceId[place.id] = ++order;
       if (last) {
@@ -377,127 +380,538 @@ function PlaceCards({
     }
   });
 
+  // 후보지는 같은 그룹(연속)끼리, 팀 분기는 연속된 team 항목끼리 하나의 박스로 묶는다.
+  type Item =
+    | { type: "place"; place: Place }
+    | { type: "group"; group: string; places: Place[] }
+    | { type: "teamBranch"; places: Place[] };
+  const items: Item[] = [];
+  for (let i = 0; i < day.places.length; i++) {
+    const place = day.places[i];
+    if (placeKind(place) === "candidate") {
+      const group = place.candidateGroup!.trim();
+      const groupPlaces: Place[] = [];
+      while (
+        i < day.places.length &&
+        placeKind(day.places[i]) === "candidate" &&
+        day.places[i].candidateGroup!.trim() === group
+      ) {
+        groupPlaces.push(day.places[i]);
+        i++;
+      }
+      i--; // for 루프가 다시 ++하므로 보정
+      items.push({ type: "group", group, places: groupPlaces });
+    } else if (placeKind(place) === "team") {
+      const teamPlaces: Place[] = [];
+      while (i < day.places.length && placeKind(day.places[i]) === "team") {
+        teamPlaces.push(day.places[i]);
+        i++;
+      }
+      i--; // for 루프가 다시 ++하므로 보정
+      items.push({ type: "teamBranch", places: teamPlaces });
+    } else {
+      items.push({ type: "place", place });
+    }
+  }
+
   return (
     <div style={{ padding: "2px 0 16px", display: "flex", flexDirection: "column", gap: 8 }}>
-      {day.places.map((place) => {
-        const travel = travelByPlaceId[place.id];
-        const num = orderByPlaceId[place.id];
-        const clickable =
-          place.showOnMap && place.lat != null && place.lng != null;
-        const active = selectedPlaceId === place.id;
+      {items.map((item, idx) => {
+        if (item.type === "group") {
+          return (
+            <CandidateGroupCard
+              key={`g-${idx}`}
+              label={item.group}
+              places={item.places}
+              color={color}
+              selectedPlaceId={selectedPlaceId}
+              onSelectPlace={onSelectPlace}
+            />
+          );
+        }
+        if (item.type === "teamBranch") {
+          return (
+            <TeamBranchCard
+              key={`t-${idx}`}
+              places={item.places}
+              selectedPlaceId={selectedPlaceId}
+              onSelectPlace={onSelectPlace}
+            />
+          );
+        }
+        const place = item.place;
+        if (placeKind(place) === "optional") {
+          return (
+            <OptionalCard
+              key={place.id}
+              place={place}
+              color={color}
+              active={selectedPlaceId === place.id}
+              onSelectPlace={onSelectPlace}
+            />
+          );
+        }
         return (
-          <div key={place.id}>
-            {travel && (
-              <div
+          <ConfirmedCard
+            key={place.id}
+            place={place}
+            color={color}
+            num={orderByPlaceId[place.id]}
+            travel={travelByPlaceId[place.id]}
+            active={selectedPlaceId === place.id}
+            onSelectPlace={onSelectPlace}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+// 카테고리별 아이콘(후보지 그룹 헤더 등)
+function categoryIcon(category?: string): string {
+  switch (category) {
+    case "식사":
+      return "🍽";
+    case "카페":
+      return "☕";
+    case "숙소":
+      return "🏨";
+    case "이동":
+      return "🚗";
+    default:
+      return "📍";
+  }
+}
+
+/* ── 확정 장소 카드 (기존 스타일 + 이동시간) ── */
+function ConfirmedCard({
+  place,
+  color,
+  num,
+  travel,
+  active,
+  onSelectPlace,
+}: {
+  place: Place;
+  color: string;
+  num?: number;
+  travel?: { km: number; min: number };
+  active: boolean;
+  onSelectPlace: (id: string) => void;
+}) {
+  const clickable = place.showOnMap && place.lat != null && place.lng != null;
+  return (
+    <div>
+      {travel && (
+        <div style={{ fontSize: 11.5, color: "var(--muted)", margin: "0 0 8px 8px" }}>
+          🚗 약 {travel.min}분 이동 (직선 {travel.km.toFixed(1)}km · 근사치)
+        </div>
+      )}
+      <div
+        onClick={() => clickable && onSelectPlace(place.id)}
+        style={{
+          display: "flex",
+          gap: 12,
+          padding: 12,
+          background: "var(--card)",
+          border: `1px solid ${active ? color : "var(--border)"}`,
+          borderLeft: `3px solid ${color}`,
+          borderRadius: 10,
+          boxShadow: active ? `0 0 0 1px ${color}33` : "none",
+          cursor: clickable ? "pointer" : "default",
+          transition: "border-color .15s, box-shadow .15s",
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+            {num != null && (
+              <span
                 style={{
-                  fontSize: 11.5,
-                  color: "var(--muted)",
-                  margin: "0 0 8px 8px",
+                  flexShrink: 0,
+                  width: 19,
+                  height: 19,
+                  borderRadius: "50%",
+                  background: color,
+                  color: "#fff",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                🚗 약 {travel.min}분 이동 (직선 {travel.km.toFixed(1)}km · 근사치)
-              </div>
+                {num}
+              </span>
             )}
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 600,
+                letterSpacing: "0.03em",
+                color: "var(--muted)",
+              }}
+            >
+              {place.category}
+            </span>
+            {place.time && (
+              <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{place.time}</span>
+            )}
+          </div>
+          <div style={{ fontWeight: 700, color: "var(--ink)", fontSize: 14.5, lineHeight: 1.3 }}>
+            {place.name}
+          </div>
+          {place.memo && (
             <div
+              style={{
+                fontSize: 12.5,
+                color: "var(--ink-soft)",
+                marginTop: 4,
+                lineHeight: 1.45,
+                whiteSpace: "pre-line",
+              }}
+            >
+              {place.memo}
+            </div>
+          )}
+        </div>
+        {place.image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={place.image}
+            alt={place.name}
+            style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 8, flexShrink: 0 }}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── 선택사항 카드 (점선·반투명, 순번 없음, "선택" 뱃지) ── */
+function OptionalCard({
+  place,
+  color,
+  active,
+  onSelectPlace,
+}: {
+  place: Place;
+  color: string;
+  active: boolean;
+  onSelectPlace: (id: string) => void;
+}) {
+  const clickable = place.showOnMap && place.lat != null && place.lng != null;
+  return (
+    <div
+      onClick={() => clickable && onSelectPlace(place.id)}
+      style={{
+        display: "flex",
+        gap: 12,
+        padding: 12,
+        background: "transparent",
+        border: `1px dashed ${active ? color : "var(--border)"}`,
+        borderLeft: `3px dashed ${color}`,
+        borderRadius: 10,
+        opacity: 0.95,
+        cursor: clickable ? "pointer" : "default",
+        transition: "border-color .15s",
+      }}
+    >
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+          <span
+            style={{
+              flexShrink: 0,
+              fontSize: 9.5,
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              color,
+              border: `1px dashed ${color}`,
+              borderRadius: 999,
+              padding: "1px 7px",
+              background: `${color}12`,
+            }}
+          >
+            선택
+          </span>
+          <span
+            style={{
+              fontSize: 10.5,
+              fontWeight: 600,
+              letterSpacing: "0.03em",
+              color: "var(--muted)",
+            }}
+          >
+            {place.category}
+          </span>
+          {place.time && (
+            <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{place.time}</span>
+          )}
+        </div>
+        <div style={{ fontWeight: 700, color: "var(--ink-soft)", fontSize: 14.5, lineHeight: 1.3 }}>
+          {place.name}
+        </div>
+        {place.memo && (
+          <div
+            style={{
+              fontSize: 12.5,
+              color: "var(--muted)",
+              marginTop: 4,
+              lineHeight: 1.45,
+              whiteSpace: "pre-line",
+            }}
+          >
+            {place.memo}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── 후보지 그룹 박스 (택1 후보들을 묶어 표시, 선택 인터랙션은 없음) ── */
+function CandidateGroupCard({
+  label,
+  places,
+  color,
+  selectedPlaceId,
+  onSelectPlace,
+}: {
+  label: string;
+  places: Place[];
+  color: string;
+  selectedPlaceId: string | null;
+  onSelectPlace: (id: string) => void;
+}) {
+  const icon = categoryIcon(places[0]?.category);
+  const time = places.find((p) => p.time)?.time;
+  return (
+    <div
+      style={{
+        border: `1px solid ${color}55`,
+        background: `${color}0F`,
+        borderRadius: 12,
+        padding: "11px 12px 12px",
+      }}
+    >
+      {/* 그룹 헤더 */}
+      <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 9 }}>
+        <span style={{ fontSize: 14 }}>{icon}</span>
+        <span style={{ fontWeight: 800, fontSize: 13.5, color: "var(--ink)" }}>{label}</span>
+        {time && <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{time}</span>}
+        <span
+          style={{
+            marginLeft: "auto",
+            fontSize: 10,
+            fontWeight: 700,
+            color,
+            border: `1px solid ${color}66`,
+            borderRadius: 999,
+            padding: "1px 8px",
+            background: "var(--card)",
+          }}
+        >
+          후보 {places.length}곳
+        </span>
+      </div>
+
+      {/* 후보 목록 */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {places.map((place) => {
+          const clickable = place.showOnMap && place.lat != null && place.lng != null;
+          const active = selectedPlaceId === place.id;
+          return (
+            <div
+              key={place.id}
               onClick={() => clickable && onSelectPlace(place.id)}
               style={{
                 display: "flex",
-                gap: 12,
-                padding: 12,
+                gap: 8,
+                padding: "8px 10px",
                 background: "var(--card)",
                 border: `1px solid ${active ? color : "var(--border)"}`,
-                borderLeft: `3px solid ${color}`,
-                borderRadius: 10,
+                borderRadius: 8,
                 boxShadow: active ? `0 0 0 1px ${color}33` : "none",
                 cursor: clickable ? "pointer" : "default",
                 transition: "border-color .15s, box-shadow .15s",
               }}
             >
+              <span
+                style={{
+                  flexShrink: 0,
+                  marginTop: 5,
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: color,
+                }}
+              />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    marginBottom: 4,
-                  }}
-                >
-                  {num != null && (
-                    <span
-                      style={{
-                        flexShrink: 0,
-                        width: 19,
-                        height: 19,
-                        borderRadius: "50%",
-                        background: color,
-                        color: "#fff",
-                        fontSize: 11,
-                        fontWeight: 700,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {num}
-                    </span>
-                  )}
-                  <span
-                    style={{
-                      fontSize: 10.5,
-                      fontWeight: 600,
-                      letterSpacing: "0.03em",
-                      color: "var(--muted)",
-                    }}
-                  >
-                    {place.category}
-                  </span>
-                  {place.time && (
-                    <span style={{ fontSize: 11.5, color: "var(--muted)" }}>
-                      {place.time}
-                    </span>
-                  )}
-                </div>
-                <div
-                  style={{
-                    fontWeight: 700,
-                    color: "var(--ink)",
-                    fontSize: 14.5,
-                    lineHeight: 1.3,
-                  }}
+                  style={{ fontWeight: 700, color: "var(--ink)", fontSize: 13.5, lineHeight: 1.3 }}
                 >
                   {place.name}
                 </div>
                 {place.memo && (
                   <div
                     style={{
-                      fontSize: 12.5,
+                      fontSize: 12,
                       color: "var(--ink-soft)",
-                      marginTop: 4,
-                      lineHeight: 1.45,
+                      marginTop: 2,
+                      lineHeight: 1.4,
+                      whiteSpace: "pre-line",
                     }}
                   >
                     {place.memo}
                   </div>
                 )}
               </div>
-              {place.image && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={place.image}
-                  alt={place.name}
-                  style={{
-                    width: 64,
-                    height: 64,
-                    objectFit: "cover",
-                    borderRadius: 8,
-                    flexShrink: 0,
-                  }}
-                />
-              )}
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// 팀 분기 트랙 색상 (day 색·후보지 톤과 구분되도록 별도 팔레트)
+const TEAM_COLORS = ["#3F8E8C", "#8E5A6E", "#C79A3A", "#4E7A9E"];
+
+/* ── 팀 분기 박스 (팀이 나뉘어 동시에 각자 진행 — 나란한 트랙으로 표시) ── */
+function TeamBranchCard({
+  places,
+  selectedPlaceId,
+  onSelectPlace,
+}: {
+  places: Place[];
+  selectedPlaceId: string | null;
+  onSelectPlace: (id: string) => void;
+}) {
+  // 팀별로 묶는다(등장 순서 유지)
+  const order: string[] = [];
+  const byTeam: Record<string, Place[]> = {};
+  places.forEach((p) => {
+    const t = (p.team ?? "").trim() || "팀";
+    if (!byTeam[t]) {
+      byTeam[t] = [];
+      order.push(t);
+    }
+    byTeam[t].push(p);
+  });
+
+  return (
+    <div
+      style={{
+        border: "1px solid var(--border)",
+        borderRadius: 12,
+        padding: "11px 12px 12px",
+        background: "var(--card)",
+      }}
+    >
+      {/* 헤더 */}
+      <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 10 }}>
+        <span style={{ fontSize: 14 }}>🔀</span>
+        <span style={{ fontWeight: 800, fontSize: 13.5, color: "var(--ink)" }}>
+          팀별로 나뉘어 진행
+        </span>
+        <span
+          style={{
+            marginLeft: "auto",
+            fontSize: 10,
+            fontWeight: 700,
+            color: "var(--muted)",
+            border: "1px solid var(--border)",
+            borderRadius: 999,
+            padding: "1px 8px",
+          }}
+        >
+          {order.length}팀 동시
+        </span>
+      </div>
+
+      {/* 팀별 트랙 (나란히, 좁으면 세로로) */}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {order.map((teamName, i) => {
+          const tColor = TEAM_COLORS[i % TEAM_COLORS.length];
+          return (
+            <div
+              key={teamName}
+              style={{
+                flex: "1 1 130px",
+                minWidth: 0,
+                border: `1px solid ${tColor}55`,
+                background: `${tColor}12`,
+                borderRadius: 10,
+                padding: 8,
+              }}
+            >
+              {/* 팀 라벨 */}
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: "#fff",
+                  background: tColor,
+                  borderRadius: 999,
+                  padding: "2px 9px",
+                  marginBottom: 7,
+                }}
+              >
+                👥 {teamName}
+              </div>
+              {/* 팀 일정 */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                {byTeam[teamName].map((place) => {
+                  const clickable =
+                    place.showOnMap && place.lat != null && place.lng != null;
+                  const active = selectedPlaceId === place.id;
+                  return (
+                    <div
+                      key={place.id}
+                      onClick={() => clickable && onSelectPlace(place.id)}
+                      style={{
+                        background: "var(--card)",
+                        border: `1px solid ${active ? tColor : "var(--border)"}`,
+                        borderRadius: 7,
+                        padding: "6px 8px",
+                        cursor: clickable ? "pointer" : "default",
+                        transition: "border-color .15s",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontWeight: 700,
+                          color: "var(--ink)",
+                          fontSize: 12.5,
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {place.time ? `${place.time} · ` : ""}
+                        {place.name}
+                      </div>
+                      {place.memo && (
+                        <div
+                          style={{
+                            fontSize: 11.5,
+                            color: "var(--ink-soft)",
+                            marginTop: 2,
+                            lineHeight: 1.4,
+                            whiteSpace: "pre-line",
+                          }}
+                        >
+                          {place.memo}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

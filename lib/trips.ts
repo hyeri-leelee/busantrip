@@ -15,6 +15,12 @@ export type Place = {
   memo: string;
   showOnMap: boolean;
   image?: string | null;
+  // 확정/선택 구분. 없거나 "confirmed"이면 확정 일정으로 취급한다.
+  status?: "confirmed" | "optional";
+  // 값이 있으면 "후보지"로 취급하고, 같은 문자열끼리 한 그룹으로 묶는다(그룹 라벨 겸용).
+  candidateGroup?: string;
+  // 값이 있으면 "팀 분기"로 취급한다. 팀이 나뉘어 동시에 각자 진행하는 일정(팀명 겸용).
+  team?: string;
 };
 
 // 지도에 그릴 경로 라인(도보길 등). path는 위경도 좌표를 순서대로 잇는다.
