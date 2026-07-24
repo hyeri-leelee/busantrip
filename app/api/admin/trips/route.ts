@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import { canEdit, createTrip, type MapProvider } from "@/lib/trips";
+import { isAuthenticated } from "@/lib/auth";
 
 export async function POST(request: Request) {
   if (!canEdit()) {
     return NextResponse.json(
-      { error: "편집은 로컬 개발 환경에서만 가능합니다." },
+      { error: "편집 저장소가 설정되지 않았습니다." },
       { status: 403 }
     );
+  }
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
   }
 
   let body: { slug?: string; title?: string; mapProvider?: MapProvider };
@@ -28,7 +32,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    createTrip(slug, title, mapProvider);
+    await createTrip(slug, title, mapProvider);
     return NextResponse.json({ ok: true, slug });
   } catch (e) {
     return NextResponse.json(

@@ -1,25 +1,33 @@
 import Link from "next/link";
 import { canEdit, getAllTripSummaries } from "@/lib/trips";
+import { isAuthenticated } from "@/lib/auth";
 import NewTripForm from "@/components/admin/NewTripForm";
+import AdminLogin from "@/components/admin/AdminLogin";
 
 export const metadata = { title: "백오피스" };
 
-export default function AdminHome() {
+export default async function AdminHome() {
   if (!canEdit()) {
     return (
       <main style={{ maxWidth: 640, margin: "0 auto", padding: "48px 20px", color: "#111" }}>
         <h1 style={{ fontSize: 24, fontWeight: 800 }}>백오피스</h1>
         <p style={{ color: "#888", marginTop: 12, lineHeight: 1.6 }}>
-          편집 기능은 <b>로컬 개발 환경</b>에서만 사용할 수 있습니다.
-          <br />내 PC에서 <code>npm run dev</code> 실행 후{" "}
-          <code>/admin</code> 에 접속해 편집하고, 변경 사항을 git에 커밋·push하면
-          배포에 반영됩니다.
+          편집 저장소가 설정되지 않았습니다.
+          <br />
+          프로덕션에서 편집하려면 Vercel 환경변수에{" "}
+          <code>ADMIN_PASSWORD</code>, <code>GITHUB_TOKEN</code>,{" "}
+          <code>GITHUB_REPO</code> 를 설정하세요. 로컬에서는{" "}
+          <code>npm run dev</code> 로 바로 편집할 수 있습니다.
         </p>
         <Link href="/" style={{ color: "#4D96FF" }}>
           ← 여행 목록으로
         </Link>
       </main>
     );
+  }
+
+  if (!(await isAuthenticated())) {
+    return <AdminLogin />;
   }
 
   const trips = getAllTripSummaries();
@@ -33,7 +41,8 @@ export default function AdminHome() {
         </Link>
       </div>
       <p style={{ color: "#888", marginTop: 6, marginBottom: 24, fontSize: 14 }}>
-        여행을 추가·편집한 뒤 git에 커밋·push하면 배포에 반영됩니다.
+        저장하면 GitHub에 자동 커밋되고, 약 1~2분 뒤 배포에 반영됩니다.
+        (로컬에서 편집한 경우엔 직접 git push)
       </p>
 
       <section style={{ marginBottom: 32 }}>

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { isGithubConfigured, githubPutFile, githubDeleteFile } from "./github";
 
 // 여행지별 일정 데이터는 data/trips/<slug>.json 에 저장한다.
 // 새 여행지를 추가하려면 이 폴더에 JSON 파일만 넣으면 자동으로 라우트가 생성된다.
@@ -110,44 +111,67 @@ export function getAllTripSummaries(): TripSummary[] {
   });
 }
 
-// ---- 쓰기(write) — 백오피스 전용, 로컬 개발 환경에서만 동작 ----
-// Vercel 등 프로덕션은 파일 시스템이 읽기 전용이므로 편집이 불가능하다.
-export function canEdit(): boolean {
+// ---- 쓰기(write) — 백오피스 전용 ----
+// 로컬 개발: 파일시스템에 직접 저장.
+// 프로덕션(Vercel): 파일시스템이 읽기 전용이므로 GitHub API로 커밋(→ 자동 재배포).
+function isLocalWritable(): boolean {
   return process.env.NODE_ENV !== "production";
+}
+
+// 편집(저장)이 가능한 환경인지: 로컬이거나, 프로덕션이면 GitHub 저장소가 설정된 경우.
+export function canEdit(): boolean {
+  return isLocalWritable() || isGithubConfigured();
 }
 
 function tripFilePath(slug: string): string {
   return path.join(TRIPS_DIR, `${slug}.json`);
 }
 
-export function saveTrip(slug: string, trip: Trip): void {
-  if (!canEdit()) throw new Error("편집은 로컬 개발 환경에서만 가능합니다.");
-  if (!isValidSlug(slug)) throw new Error("잘못된 slug 형식입니다.");
-  if (!fs.existsSync(TRIPS_DIR)) fs.mkdirSync(TRIPS_DIR, { recursive: true });
-  const data = { trip };
-  fs.writeFileSync(tripFilePath(slug), JSON.stringify(data, null, 2) + "\n", "utf-8");
+function githubPath(slug: string): string {
+  return `data/trips/${slug}.json`;
 }
 
-export function createTrip(
+function serializeTrip(trip: Trip): string {
+  return JSON.stringify({ trip }, null, 2) + "\n";
+}
+
+export async function saveTrip(slug: string, trip: Trip): Promise<void> {
+  if (!canEdit()) throw new Error("편집 저장소가 설정되지 않았습니다.");
+  if (!isValidSlug(slug)) throw new Error("잘못된 slug 형식입니다.");
+  const content = serializeTrip(trip);
+  if (isLocalWritable()) {
+    if (!fs.existsSync(TRIPS_DIR)) fs.mkdirSync(TRIPS_DIR, { recursive: true });
+    fs.writeFileSync(tripFilePath(slug), content, "utf-8");
+    return;
+  }
+  await githubPutFile(githubPath(slug), content, `chore(admin): ${slug} 일정 수정`);
+}
+
+export async function createTrip(
   slug: string,
   title: string,
   mapProvider: MapProvider
-): Trip {
-  if (!canEdit()) throw new Error("편집은 로컬 개발 환경에서만 가능합니다.");
+): Promise<Trip> {
+  if (!canEdit()) throw new Error("편집 저장소가 설정되지 않았습니다.");
   if (!isValidSlug(slug)) {
     throw new Error("slug는 영소문자·숫자·하이픈만 사용할 수 있습니다.");
   }
+  // 중복 체크(배포 스냅샷 기준). 프로덕션에서 방금 만든 여행은 재배포 전까지 스냅샷에 없다.
   if (fs.existsSync(tripFilePath(slug))) {
     throw new Error("이미 존재하는 slug입니다.");
   }
   const trip: Trip = { title, mapProvider, days: [] };
-  saveTrip(slug, trip);
+  await saveTrip(slug, trip);
   return trip;
 }
 
-export function deleteTrip(slug: string): void {
-  if (!canEdit()) throw new Error("편집은 로컬 개발 환경에서만 가능합니다.");
+export async function deleteTrip(slug: string): Promise<void> {
+  if (!canEdit()) throw new Error("편집 저장소가 설정되지 않았습니다.");
   if (!isValidSlug(slug)) throw new Error("잘못된 slug 형식입니다.");
-  const file = tripFilePath(slug);
-  if (fs.existsSync(file)) fs.rmSync(file);
+  if (isLocalWritable()) {
+    const file = tripFilePath(slug);
+    if (fs.existsSync(file)) fs.rmSync(file);
+    return;
+  }
+  await githubDeleteFile(githubPath(slug), `chore(admin): ${slug} 삭제`);
 }
